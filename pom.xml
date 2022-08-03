@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -27,30 +27,25 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- SWAGGER-UI -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.9</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>2.7.2</version>
 		</dependency>
 
-
-		<!-- POSTGRES -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
+			<version>42.4.0</version>
 		</dependency>
 
 	</dependencies>
@@ -85,10 +80,9 @@
 				<configuration>
 					<driver>org.postgresql.Driver</driver>
 					<url>jdbc:postgresql://localhost:5432/migrations</url>
-					<user>postgres</user>
-					<password>admin</password>
+					<user>cezar</user>
+					<password>parola</password>
 					<baselineOnMigrate>true</baselineOnMigrate>
-					<schemas>public</schemas>
 					<locations>
 						<location>
 							filesystem:src/main/resources/db/migration
@@ -96,7 +90,6 @@
 					</locations>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 
