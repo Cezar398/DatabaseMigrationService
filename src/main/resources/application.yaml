@@ -1,0 +1,6 @@
+server:
+  address: 8080
+spring:
+  application:
+    name: movie-migration-service
+//TOD: add flyway config, postgres config, add swagger config
