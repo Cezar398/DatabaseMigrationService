@@ -2,9 +2,11 @@ spring:
   application:
     name: movie-migration-service
   flyway:
-    user: postgres
-    password: password
-    schemas: migrationScheme
+    baseline-on-migrate: true
+  datasource:
+    username: postgres
+    password: parola
+    url: jdbc:postgresql://localhost:5432/migrations
 
 springdoc:
   swagger-ui:
