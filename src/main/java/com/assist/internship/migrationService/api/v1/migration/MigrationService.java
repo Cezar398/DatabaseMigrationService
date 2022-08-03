@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 public class MigrationService {
     public void start(String url)
     {
-
+        System.out.println(url);
     }
 }
