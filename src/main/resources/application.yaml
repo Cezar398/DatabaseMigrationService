@@ -1,9 +1,13 @@
 spring:
   application:
     name: movie-migration-service
+  flyway:
+    user: postgres
+    password: password
+    schemas: migrationScheme
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-#: add flyway config, postgres config, add swagger config(added)
+#TODO: add flyway config, postgres config, add swagger config(added)

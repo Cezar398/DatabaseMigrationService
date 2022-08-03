@@ -33,10 +33,19 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- SWAGGER-UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.6.9</version>
+		</dependency>
+
+
+		<!-- FLYWAY -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>9.0.4</version>
 		</dependency>
 
 	</dependencies>
