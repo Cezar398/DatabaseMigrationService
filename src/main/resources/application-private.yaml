@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/movies
     username: cezar
-    password: parola
+    password: paroladasd
     driver-class-name: org.postgresql.Driver
 
   jpa:
