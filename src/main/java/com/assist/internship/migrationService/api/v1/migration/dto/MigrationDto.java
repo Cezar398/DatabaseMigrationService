@@ -1,17 +1,9 @@
-package com.assist.internship.migrationService.entity;
+package com.assist.internship.migrationService.api.v1.migration.dto;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 @Data
-@Entity
-@Table(name = "migrations", schema = "public")
-public class Migration {
-    @Id
-    private String id;
+public class MigrationDto {
     private String title;
     private String overview;
     private String poster_path;

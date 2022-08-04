@@ -1,12 +1,14 @@
 package com.assist.internship.migrationService.api.v1.migration;
 
+import com.assist.internship.migrationService.api.v1.migration.dto.MigrationDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MigrationService {
-    public void start(String url)
+    public void create(MigrationDto bodyData)
     {
-        //Branch Test
-        System.out.println(url);
+        log.info(bodyData.toString());
     }
 }
