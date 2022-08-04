@@ -61,6 +61,13 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
@@ -79,29 +86,14 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<version>9.0.1</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>migrate</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
-					<driver>org.postgresql.Driver</driver>
-					<url>jdbc:postgresql://localhost:5432/migrations</url>
 					<user>cezar</user>
 					<password>parola</password>
-					<baselineOnMigrate>true</baselineOnMigrate>
-					<locations>
-						<location>
-							filesystem:src/main/resources/db/migration
-						</location>
-					</locations>
+					<url>jdbc:postgresql://localhost:5432/movies</url>
 				</configuration>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>9.1.2</version>
 			</plugin>
 		</plugins>
 	</build>
