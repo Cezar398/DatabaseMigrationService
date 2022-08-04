@@ -1,4 +1,4 @@
-CREATE TABLE public.migrations
+CREATE TABLE public.movie
 (
     id           varchar(255) PRIMARY KEY,
     title        varchar(255) not null,

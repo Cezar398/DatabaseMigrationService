@@ -13,4 +13,4 @@ public class MigrationDto {
     private Boolean video;
     private Float vote_average;
     private Integer vote_count;
-}
+    }
