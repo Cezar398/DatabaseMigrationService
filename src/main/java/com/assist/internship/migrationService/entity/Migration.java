@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "migrations", schema = "public")
+@Table(name = "movie", schema = "public")
 public class Migration {
     @Id
     private String id;

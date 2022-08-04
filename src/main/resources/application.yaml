@@ -1,37 +1,3 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/movies
-    username: cezar
-    password: parola
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    show-sql: true
-
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    url: jdbc:postgresql://localhost:5432/movies
-    user: cezar
-    password: parola
-    baseline-on-migrate: false
-    locations: classpath:db/migration
-    schemas: public
-
-
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-
-  api-docs:
-    path: /api-docs
-
-
-#spring.datasource.username=cezar
-#spring.datasource.password=parola
-#spring.jpa.hibernate.ddl-auto=create-drop
-#spring.jpa.show-sql=true
-#springdoc.swagger-ui.path=/swagger-ui.html
-#springdoc.api-docs.path=/api-docs
+  profiles:
+    active: private
