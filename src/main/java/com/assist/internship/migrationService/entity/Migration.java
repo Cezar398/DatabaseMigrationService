@@ -1,16 +1,17 @@
 package com.assist.internship.migrationService.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @Entity
 @Table(name = "movie", schema = "public")
 public class Migration {
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
     private String title;
     private String overview;
@@ -21,4 +22,6 @@ public class Migration {
     private Boolean video;
     private Float vote_average;
     private Integer vote_count;
+
+
 }
