@@ -47,14 +47,14 @@ public class MigrationService {
 
     private Movie constructMovieData(MigrationDto dtoMigration) {
         Movie localMovie = new Movie();
-        localMovie.setMediaType(dtoMigration.getMedia_type());
+        localMovie.setMediaType(dtoMigration.getMediaType());
         localMovie.setOverview(dtoMigration.getOverview());
         localMovie.setPopularity(dtoMigration.getPopularity());
-        localMovie.setPosterPath(dtoMigration.getPoster_path());
-        localMovie.setReleaseDate(dtoMigration.getRelease_date());
+        localMovie.setPosterPath(dtoMigration.getPosterPath());
+        localMovie.setReleaseDate(dtoMigration.getReleaseDate());
         localMovie.setVideo(dtoMigration.getVideo());
-        localMovie.setVoteAverage(dtoMigration.getVote_average());
-        localMovie.setVoteCount(dtoMigration.getVote_count());
+        localMovie.setVoteAverage(dtoMigration.getVoteAverage());
+        localMovie.setVoteCount(dtoMigration.getVoteCount());
         localMovie.setTitle(dtoMigration.getTitle());
         return localMovie;
     }

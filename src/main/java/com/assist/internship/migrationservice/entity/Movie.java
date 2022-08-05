@@ -4,6 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -27,4 +29,7 @@ public class Movie {
     private Float voteAverage;
     @Column(name = "vote_count")
     private Integer voteCount;
+    @OneToMany
+    @JoinColumn(name = "rating_id")
+    private Set<Rating> ratings = new HashSet<>();
 }

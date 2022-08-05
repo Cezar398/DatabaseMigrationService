@@ -6,11 +6,11 @@ import lombok.Data;
 public class MigrationDto {
     private String title;
     private String overview;
-    private String poster_path;
-    private String media_type;
+    private String posterPath;
+    private String mediaType;
     private String popularity;
-    private String release_date;
+    private String releaseDate;
     private Boolean video;
-    private Float vote_average;
-    private Integer vote_count;
+    private Float voteAverage;
+    private Integer voteCount;
     }
