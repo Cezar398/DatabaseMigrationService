@@ -29,8 +29,7 @@ public class MovieController {
         List<Movie> getMovies = movieService.getAll();
 
         if (getMovies.isEmpty()) {
-            ResponseEntity<String> noContent = new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
-            return noContent;
+            return new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
         }
 
         return movieService.getAll();
