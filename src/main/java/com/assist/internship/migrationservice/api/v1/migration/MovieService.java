@@ -12,37 +12,57 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MigrationService {
-    private final MigrationRepository migrationRepository;
+public class MovieService {
+    private final MovieRepository movieRepository;
 
-    public void create(MigrationDto dtoMigration) {
+    public String create(MigrationDto dtoMigration) {
         Movie localMovie = constructMovieData(dtoMigration);
-        migrationRepository.save(localMovie);
+        movieRepository.save(localMovie);
+
+        return localMovie.toString();
     }
 
     public List<Movie> getAll() {
-        List<Movie> list;
-        list = migrationRepository.findAll();
-        return list;
+        return movieRepository.findAll();
     }
 
     public Optional<Movie> getById(String id) {
-        return migrationRepository.findById(id);
+        return movieRepository.findById(id);
     }
 
-    public void deleteAll() {
-        migrationRepository.deleteAll();
+    public boolean deleteAll() {
+        List<Movie> movieList = movieRepository.findAll();
+
+        if (!movieList.isEmpty()) {
+            movieRepository.deleteAll();
+            return true;
+        }
+
+        return false;
     }
 
-    public void deleteById(String id) {
-        migrationRepository.deleteById(id);
+    public boolean deleteById(String id) {
+        Optional<Movie> movie = movieRepository.findById(id);
+
+        if (movie.isPresent()) {
+            movieRepository.deleteById(id);
+            return true;
+        }
+
+        return false;
     }
 
-    public void updateById(String id, MigrationDto migrationDto) {
-        Movie oldMovie = migrationRepository.getReferenceById(id);
-        Movie updatedMovie = constructMovieData(migrationDto);
-        updatedMovie.setId(oldMovie.getId());
-        migrationRepository.save(updatedMovie);
+    public Object updateById(String id, MigrationDto migrationDto) {
+
+        if (movieRepository.findById(id).isPresent()) {
+            Movie oldMovie = movieRepository.getReferenceById(id);
+            Movie updatedMovie = constructMovieData(migrationDto);
+            updatedMovie.setId(oldMovie.getId());
+            movieRepository.save(updatedMovie);
+            return updatedMovie.toString();
+        }
+
+        return false;
     }
 
     private Movie constructMovieData(MigrationDto dtoMigration) {
