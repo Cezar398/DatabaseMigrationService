@@ -90,11 +90,6 @@
 			</plugin>
 
 			<plugin>
-				<configuration>
-					<user>cezar</user>
-					<password>parola</password>
-					<url>jdbc:postgresql://localhost:5432/movies</url>
-				</configuration>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
 				<version>9.1.2</version>
