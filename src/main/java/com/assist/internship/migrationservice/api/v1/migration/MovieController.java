@@ -3,7 +3,6 @@ package com.assist.internship.migrationservice.api.v1.migration;
 import com.assist.internship.migrationservice.api.v1.migration.dto.MigrationDto;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Slf4j
 @RequestMapping(value = "/api/v1/movie")
 @RequiredArgsConstructor
 public class MovieController {
