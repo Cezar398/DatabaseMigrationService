@@ -19,6 +19,8 @@ public class MovieController {
     private final MovieService movieService;
     private static final String NO_CONTENT_HTTP_RESPONSE = "No content";
     private static final String OK_HTTP_RESPONSE = "OK";
+    private final String MOVIE_NOT_FOUND = "Movie not found!";
+
 
     @PostMapping()
     public Optional<Movie> create(MigrationDto migration) {
@@ -35,7 +37,7 @@ public class MovieController {
         Optional<Movie> movie = movieService.getById(id);
 
         if (movie.equals(Optional.empty())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MOVIE_NOT_FOUND);
         }
         return movie;
     }
@@ -51,7 +53,7 @@ public class MovieController {
     @DeleteMapping(path = "/{id}")
     public void deleteById(@PathVariable("id") String id) {
 
-        if (!movieService.deleteById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found!");
+        if (!movieService.deleteById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, MOVIE_NOT_FOUND);
     }
 
     @PutMapping(path = "/{id}")
