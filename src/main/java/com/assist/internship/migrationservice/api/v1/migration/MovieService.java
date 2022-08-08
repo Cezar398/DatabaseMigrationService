@@ -39,7 +39,6 @@ public class MovieService {
             movieRepository.deleteAll();
             return true;
         }
-
         return false;
     }
 

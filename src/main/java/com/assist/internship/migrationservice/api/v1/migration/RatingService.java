@@ -2,22 +2,38 @@ package com.assist.internship.migrationservice.api.v1.migration;
 
 import com.assist.internship.migrationservice.api.v1.migration.dto.RatingDto;
 import com.assist.internship.migrationservice.entity.Rating;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-@Slf4j
+@RequiredArgsConstructor
 public class RatingService {
-    RatingRepository ratingRepository;
+    private final RatingRepository ratingRepository;
 
-    public void addRating(RatingDto ratingDto)
+    public List<Rating> getAll()
     {
-        Rating rating = new Rating();
+        return ratingRepository.findAll();
+    }
 
-        rating.setRate(ratingDto.getRate());
-        rating.setMovie(ratingDto.getMovie());
-        rating.setContent(ratingDto.getContent());
+    public Optional<Rating> createRating(RatingDto ratingDto)
+    {
+        Rating newRating = constructRating(ratingDto);
 
-        ratingRepository.save(rating);
+        ratingRepository.save(newRating);
+
+        return Optional.of(newRating);
+    }
+
+    private Rating constructRating(RatingDto ratingDto)
+    {
+        Rating localRating = new Rating();
+
+        localRating.setRate(ratingDto.getRate());
+        localRating.setRateContent(ratingDto.getContent());
+
+        return localRating;
     }
 }

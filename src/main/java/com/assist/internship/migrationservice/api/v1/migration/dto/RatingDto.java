@@ -7,5 +7,5 @@ import lombok.Data;
 public class RatingDto {
     private String content;
     private Integer rate;
-    private Movie movie;
+    private Movie movieId;
 }

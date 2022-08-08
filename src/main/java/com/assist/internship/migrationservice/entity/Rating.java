@@ -13,9 +13,11 @@ public class Rating {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
-    private String content;
-    private Integer rate;
+    @Column(name = "content")
+    private String rateContent;
+    @Column(name = "rate")
+    private int rate;
     @ManyToOne
-    @JoinColumn(name = "rating_id")
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 }

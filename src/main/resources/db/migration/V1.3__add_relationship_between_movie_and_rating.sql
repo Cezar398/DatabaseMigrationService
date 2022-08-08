@@ -17,7 +17,6 @@ DROP TABLE IF EXISTS public.rating;
 CREATE TABLE IF NOT EXISTS public.rating
 (
     id       varchar(255) PRIMARY KEY,
-    rating_id varchar(255) not null,
     content  varchar(255) not null,
     rate     int          not null,
     movie_id varchar(255) not null,

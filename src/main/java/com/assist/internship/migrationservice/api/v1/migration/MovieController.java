@@ -29,7 +29,9 @@ public class MovieController {
 
     @GetMapping()
     public List<Movie> getAll() {
+
         return movieService.getAll();
+
     }
 
     @GetMapping(path = "/{id}")

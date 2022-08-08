@@ -4,8 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -29,7 +29,6 @@ public class Movie {
     private Float voteAverage;
     @Column(name = "vote_count")
     private Integer voteCount;
-    @OneToMany
-    @JoinColumn(name = "movie_id")
-    private Set<Rating> ratings = new HashSet<>();
+    @OneToMany(mappedBy = "movie")
+    private List<Rating> ratings = new ArrayList<>();
 }
