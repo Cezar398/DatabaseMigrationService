@@ -4,7 +4,6 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -30,5 +29,5 @@ public class Movie {
     @Column(name = "vote_count")
     private Integer voteCount;
     @OneToMany(mappedBy = "movie")
-    private List<Rating> ratings = new ArrayList<>();
+    private List<Rating> ratings;
 }

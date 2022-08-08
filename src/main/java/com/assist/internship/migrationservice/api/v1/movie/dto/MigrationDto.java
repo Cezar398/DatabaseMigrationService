@@ -1,4 +1,4 @@
-package com.assist.internship.migrationservice.api.v1.migration.dto;
+package com.assist.internship.migrationservice.api.v1.movie.dto;
 
 import lombok.Data;
 

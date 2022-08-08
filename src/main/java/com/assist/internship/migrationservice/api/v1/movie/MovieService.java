@@ -1,13 +1,12 @@
-package com.assist.internship.migrationservice.api.v1.migration;
+package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.migration.dto.MigrationDto;
+import com.assist.internship.migrationservice.api.v1.movie.dto.MigrationDto;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,42 +27,30 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Optional<Movie> getById(String id) {
-        return movieRepository.findById(id);
+    public Movie getById(String id) {
+        return movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
     }
 
-    public boolean deleteAll() {
-        List<Movie> movieList = movieRepository.findAll();
-
-        if (!movieList.isEmpty()) {
-            movieRepository.deleteAll();
-            return true;
-        }
-        return false;
+    public void deleteAll() {
+        movieRepository.deleteAll();
     }
 
-    public boolean deleteById(String id) {
-        Optional<Movie> movie = movieRepository.findById(id);
+    public void deleteById(String id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
 
-        if (movie.isPresent()) {
-            movieRepository.deleteById(id);
-            return true;
-        }
-
-        return false;
+        movieRepository.delete(movie);
     }
 
-    public Optional<Movie> updateById(String id, MigrationDto migrationDto) {
+    public Movie updateById(String id, MigrationDto migrationDto) {
+        Movie oldMovie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie not found"));
         Movie updatedMovie = constructMovieData(migrationDto);
+        updatedMovie.setId(oldMovie.getId());
 
-        if (movieRepository.findById(id).isPresent()) {
-            Movie oldMovie = movieRepository.getReferenceById(id);
-            updatedMovie.setId(oldMovie.getId());
-            movieRepository.save(updatedMovie);
-            return Optional.of(updatedMovie);
-        }
+        return movieRepository.save(updatedMovie);
 
-        throw new ResponseStatusException(HttpStatus.NO_CONTENT);
     }
 
     private Movie constructMovieData(MigrationDto dtoMigration) {

@@ -1,4 +1,4 @@
-package com.assist.internship.migrationservice.api.v1.migration;
+package com.assist.internship.migrationservice.api.v1.rating;
 
 import com.assist.internship.migrationservice.entity.Rating;
 import org.springframework.data.jpa.repository.JpaRepository;
