@@ -1,4 +1,4 @@
-CREATE TABLE public.movie
+CREATE TABLE IF NOT EXISTS public.movie
 (
     id           varchar(255) PRIMARY KEY,
     title        varchar(255) not null,

@@ -1,4 +1,4 @@
-package com.assist.internship.migrationService.api.v1.migration.dto;
+package com.assist.internship.migrationservice.api.v1.migration.dto;
 
 import lombok.Data;
 
