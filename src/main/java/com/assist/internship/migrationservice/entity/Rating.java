@@ -1,5 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,6 +18,7 @@ public class Rating {
     private String rateContent;
     @Column(name = "rate")
     private int rate;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;

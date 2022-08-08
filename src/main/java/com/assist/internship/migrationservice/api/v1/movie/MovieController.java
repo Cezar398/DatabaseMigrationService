@@ -1,12 +1,11 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.movie.dto.MigrationDto;
+import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/v1/movie")
@@ -16,8 +15,8 @@ public class MovieController {
     private final MovieService movieService;
 
     @PostMapping()
-    public Optional<Movie> create(@RequestBody MigrationDto migration) {
-        return movieService.create(migration);
+    public Movie create(@RequestBody MovieDto movieDto) {
+        return movieService.create(movieDto);
     }
 
     @GetMapping()
@@ -41,7 +40,7 @@ public class MovieController {
     }
 
     @PutMapping(path = "/{id}")
-    public Movie updateById(@PathVariable("id") String id, MigrationDto migrationDto) {
-        return movieService.updateById(id, migrationDto);
+    public Movie updateById(@PathVariable("id") String id, MovieDto movieDto) {
+        return movieService.updateById(id, movieDto);
     }
 }
