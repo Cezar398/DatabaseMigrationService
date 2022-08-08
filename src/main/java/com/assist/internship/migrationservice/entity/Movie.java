@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -27,4 +28,6 @@ public class Movie {
     private Float voteAverage;
     @Column(name = "vote_count")
     private Integer voteCount;
+    @OneToMany(mappedBy = "movie")
+    private List<Rating> ratings;
 }
