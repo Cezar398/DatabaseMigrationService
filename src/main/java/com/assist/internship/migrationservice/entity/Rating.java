@@ -16,6 +16,6 @@ public class Rating {
     private String content;
     private Integer rate;
     @ManyToOne
-    @JoinColumn(name = "movie_id")
+    @JoinColumn(name = "rating_id")
     private Movie movie;
 }

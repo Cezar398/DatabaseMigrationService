@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,63 +17,47 @@ import java.util.Optional;
 public class MovieController {
 
     private final MovieService movieService;
+    private static final String NO_CONTENT_HTTP_RESPONSE = "No content";
+    private static final String OK_HTTP_RESPONSE = "OK";
 
     @PostMapping()
-    public ResponseEntity<?> create(MigrationDto migration) {
-        String response = movieService.create(migration);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public Optional<Movie> create(MigrationDto migration) {
+        return movieService.create(migration);
     }
 
     @GetMapping()
-    public Object getAll() {
-
-        List<Movie> getMovies = movieService.getAll();
-
-        if (getMovies.isEmpty()) {
-            return new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
-        }
-
+    public List<Movie> getAll() {
         return movieService.getAll();
     }
 
     @GetMapping(path = "/{id}")
-    public Object getById(@PathVariable("id") String id) {
-        Optional<Movie> getMovie = movieService.getById(id);
+    public Optional<Movie> getById(@PathVariable("id") String id) {
+        Optional<Movie> movie = movieService.getById(id);
 
-        if (getMovie.equals(Optional.empty())) {
-            ResponseEntity<String> noContent = new ResponseEntity<>("No Content", HttpStatus.NO_CONTENT);
-            return noContent;
+        if (movie.equals(Optional.empty())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found");
         }
-        return getMovie;
+        return movie;
     }
 
     @DeleteMapping()
-    public Object deleteAll() {
+    public ResponseEntity<String> deleteAll() {
 
-        if (movieService.deleteAll() == true)
-            return new ResponseEntity<>("OK", HttpStatus.OK);
+        if (movieService.deleteAll()) return new ResponseEntity<String>(OK_HTTP_RESPONSE, HttpStatus.OK);
 
-        return new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<String>(NO_CONTENT_HTTP_RESPONSE, HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(path = "/{id}")
-    public Object deleteById(@PathVariable("id") String id) {
+    public void deleteById(@PathVariable("id") String id) {
 
-
-        if (movieService.deleteById(id) == true)
-            return new ResponseEntity<>("OK", HttpStatus.OK);
-
-        return new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
+        if (!movieService.deleteById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found!");
     }
 
     @PutMapping(path = "/{id}")
-    public Object updateById(@PathVariable("id") String id, MigrationDto migrationDto) {
+    public Optional<Movie> updateById(@PathVariable("id") String id, MigrationDto migrationDto) {
 
-        Object updatedMovie = movieService.updateById(id, migrationDto);
-
-        if(updatedMovie.equals(false))
-            return new ResponseEntity<>("No content", HttpStatus.NO_CONTENT);
-
-        return String.valueOf(updatedMovie);
+        Optional<Movie> updatedMovie = movieService.updateById(id, migrationDto);
+        return updatedMovie;
     }
 }

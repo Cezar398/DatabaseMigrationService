@@ -30,6 +30,6 @@ public class Movie {
     @Column(name = "vote_count")
     private Integer voteCount;
     @OneToMany
-    @JoinColumn(name = "rating_id")
+    @JoinColumn(name = "movie_id")
     private Set<Rating> ratings = new HashSet<>();
 }

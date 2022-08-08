@@ -4,7 +4,9 @@ import com.assist.internship.migrationservice.api.v1.migration.dto.MigrationDto;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +17,11 @@ import java.util.Optional;
 public class MovieService {
     private final MovieRepository movieRepository;
 
-    public String create(MigrationDto dtoMigration) {
+    public Optional<Movie> create(MigrationDto dtoMigration) {
         Movie localMovie = constructMovieData(dtoMigration);
         movieRepository.save(localMovie);
 
-        return localMovie.toString();
+        return Optional.of(localMovie);
     }
 
     public List<Movie> getAll() {
@@ -52,17 +54,17 @@ public class MovieService {
         return false;
     }
 
-    public Object updateById(String id, MigrationDto migrationDto) {
+    public Optional<Movie> updateById(String id, MigrationDto migrationDto) {
+        Movie updatedMovie = constructMovieData(migrationDto);
 
         if (movieRepository.findById(id).isPresent()) {
             Movie oldMovie = movieRepository.getReferenceById(id);
-            Movie updatedMovie = constructMovieData(migrationDto);
             updatedMovie.setId(oldMovie.getId());
             movieRepository.save(updatedMovie);
-            return updatedMovie.toString();
+            return Optional.of(updatedMovie);
         }
 
-        return false;
+        throw new ResponseStatusException(HttpStatus.NO_CONTENT);
     }
 
     private Movie constructMovieData(MigrationDto dtoMigration) {
