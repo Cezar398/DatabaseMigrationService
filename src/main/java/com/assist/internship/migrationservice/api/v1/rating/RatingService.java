@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,20 +20,18 @@ public class RatingService {
         return ratingRepository.findAll();
     }
 
-    public Optional<Rating> createRating(RatingDto ratingDto)
+    public Rating createRating(RatingDto ratingDto)
     {
         Rating newRating = mapToRating(ratingDto);
-
         ratingRepository.save(newRating);
 
-        return Optional.of(newRating);
+        return newRating;
     }
 
     private Rating mapToRating(RatingDto ratingDto)
     {
         Rating rating = new Rating();
         Movie movie = movieService.getById(ratingDto.getMovieId());
-
         rating.setRate(ratingDto.getRate());
         rating.setRateContent(ratingDto.getContent());
         rating.setMovie(movie);

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/v1/rating")
@@ -22,7 +21,7 @@ public class RatingController {
     }
 
     @PostMapping
-    public Optional<Rating> createRating(@RequestBody RatingDto ratingDto)
+    public Rating createRating(@RequestBody RatingDto ratingDto)
     {
        return ratingService.createRating(ratingDto);
     }
