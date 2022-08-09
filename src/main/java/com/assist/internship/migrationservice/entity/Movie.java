@@ -28,6 +28,7 @@ public class Movie {
     private Float voteAverage;
     @Column(name = "vote_count")
     private Integer voteCount;
-    @OneToMany(mappedBy = "movie")
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true)
     private List<Rating> ratings;
 }
