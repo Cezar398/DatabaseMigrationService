@@ -1,69 +1,71 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
+import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MovieMigrationService {
     private final MovieService movieService;
+    @Value("${custom.migration.baseUrl}")
+    private String baseUrl;
+    @Value("${custom.migration.token}")
+    private String token;
+    @Value("${custom.migration.username}")
+    private String migrationUsername;
+    @Value("${custom.migration.password}")
+    private String migrationPassword;
 
-    public String getIdList(String username, String password) {
-        String url = "https://imdblistids.herokuapp.com/api/v1/movie/imdb/ids";
-        String authStr = username + ":" + password;
-        String base64Creds = Base64.getEncoder().encodeToString(authStr.getBytes());
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + base64Creds);
-        HttpEntity request = new HttpEntity(headers);
-        ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.GET, request, String.class);
+    public void migrateMovies() throws JSONException {
+        log.info("Start migration!");
+        List<String> idList = getIdList();
 
-        return response.getBody();
+        List<Movie> movies = new ArrayList<>();
+        for (String id : idList) {
+            String url = String.format("%s/find/%s?api_key=%s&language=en-US&external_source=imdb_id", baseUrl, id, token);
+            WebClient webClientObj = WebClient.builder().baseUrl(url).build();
+            JSONObject jsonObject = new JSONObject(webClientObj.get().uri("").retrieve().bodyToMono(String.class).block());
+            JSONArray jsonArray = jsonObject.getJSONArray("movie_results");
+            JSONObject movieJson = jsonArray.getJSONObject(0);
+
+            movies.add(getMovie(movieJson));
+
+        }
+        movieService.saveMovies(movies);
+        log.info("Migration finished!");
     }
 
-    public void migrateMovies(String username, String password) throws JSONException {
-        String idList = getIdList(username, password);
-        String token = "a7f7650bc6053c146e113d011a993b07";
-        JSONArray json = new JSONArray(idList);
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity request = new HttpEntity(headers);
+    private Movie getMovie(JSONObject movieData) throws JSONException {
+        Movie movie = new Movie();
+        movie.setId(movieData.getString("id"));
+        movie.setTitle(movieData.getString("title"));
+        movie.setOverview(movieData.getString("overview"));
+        movie.setPosterPath(movieData.getString("poster_path"));
+        movie.setMediaType(movieData.getString("media_type"));
+        movie.setPopularity(movieData.getString("popularity"));
+        movie.setReleaseDate(movieData.getString("release_date"));
+        movie.setVideo(movieData.getBoolean("video"));
+        movie.setVoteAverage((float) movieData.getDouble("vote_average"));
+        movie.setVoteCount(movieData.getInt("vote_count"));
 
-        String url;
+        return movie;
+    }
 
-        for (int i = 0; i < json.length(); i++) {
-            url = "https://api.themoviedb.org/3/find/" + json.getString(i) + "?api_key=" + token + "&language=en-US&external_source=imdb_id";
-            ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.GET, request, String.class);
-            JSONObject jsonObject = new JSONObject(response.getBody());
-            JSONArray jsonArray = jsonObject.getJSONArray("movie_results");
-            JSONObject movieData = jsonArray.getJSONObject(0);
-            MovieDto movieDto = new MovieDto();
-
-            try {
-                movieDto.setTitle(movieData.getString("title"));
-                movieDto.setOverview(movieData.getString("overview"));
-                movieDto.setPosterPath(movieData.getString("poster_path"));
-                movieDto.setMediaType(movieData.getString("media_type"));
-                movieDto.setPopularity(movieData.getString("popularity"));
-                movieDto.setReleaseDate(movieData.getString("release_date"));
-                movieDto.setVideo(movieData.getBoolean("video"));
-                movieDto.setVoteAverage((float) movieData.getDouble("vote_average"));
-                movieDto.setVoteCount(movieData.getInt("vote_count"));
-                movieService.create(movieDto);
-            } catch (Exception e) {
-                log.info(String.valueOf(e));
-            }
-        }
+    private List<String> getIdList() {
+        WebClient webClientObj = WebClient.builder().baseUrl("https://imdblistids.herokuapp.com/api/v1/movie/imdb/ids").filter(basicAuthentication(migrationUsername, migrationPassword)).build();
+        return (List<String>) webClientObj.get().uri("").retrieve().bodyToMono(List.class).block();
     }
 }

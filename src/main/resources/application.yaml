@@ -1,29 +1,38 @@
 spring:
+  profiles:
+    include: local,default
   datasource:
-    url: jdbc:postgresql://localhost:5432/movies
-    username: cezar
-    password: parola
+    url: jdbc:postgresql://${DB_HOST}:5432/movies
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     show-sql: true
-
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 10
   flyway:
     enabled: true
-    url: jdbc:postgresql://localhost:5432/movies
-    user: cezar
-    password: parola
+    url: jdbc:postgresql://${DB_HOST}:5432/movies
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     baseline-on-migrate: false
     locations: classpath:db/migration
     schemas: public
-
-
-
+  codec:
+    max-in-memory-size: 2MB
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
   api-docs:
     path: /api-docs
+
+custom:
+  migration:
+    baseUrl:  ${BASE_URL}
+    token: ${IMDB_TOKEN}
+    username: ${IMDB_USERNAME}
+    password: ${IMDB_PASSWORD}

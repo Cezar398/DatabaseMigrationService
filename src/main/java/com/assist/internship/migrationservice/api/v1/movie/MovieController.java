@@ -1,8 +1,8 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.movie.dto.MigrationDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.entity.Movie;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class MovieController {
     private final MovieMigrationService movieMigrationService;
 
     @PostMapping()
-    public Movie create(@RequestBody MovieDto movieDto) {
+    public Movie create(@Parameter(description = "Data required for create a movie") @RequestBody MovieDto movieDto) {
         return movieService.create(movieDto);
     }
 
@@ -28,7 +28,7 @@ public class MovieController {
     }
 
     @GetMapping(path = "/{id}")
-    public Movie getById(@PathVariable("id") String id) {
+    public Movie getById(@Parameter(description = "The id for movie which will be selected") @PathVariable("id") String id) {
         return movieService.getById(id);
     }
 
@@ -38,23 +38,56 @@ public class MovieController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deleteById(@PathVariable("id") String id) {
+    public void deleteById(@Parameter(description = "The id for movie which will be deleted") @PathVariable("id") String id) {
         movieService.deleteById(id);
     }
 
     @PutMapping(path = "/{id}")
-    public Movie updateById(@PathVariable("id") String id, MovieDto movieDto) {
+    public Movie updateById(@Parameter(description = "The id for movie which will be updated") @PathVariable("id") String id, MovieDto movieDto) {
         return movieService.updateById(id, movieDto);
-    }
-    
-    @GetMapping(path = "/migrate/{username}/{password}")
-    public String getIDs(@PathVariable("username") String username, @PathVariable("password") String password){
-       return movieMigrationService.getIdList(username, password);
     }
 
     @PostMapping(path = "/migrate")
-    public void migrateMovies(@RequestBody MigrationDto migrationDto) throws JSONException {
-        System.out.println(migrationDto.getUsername()+ " " + migrationDto.getPassword());
-       movieMigrationService.migrateMovies(migrationDto.getUsername(), migrationDto.getPassword());
+    public void migrateMovies() throws JSONException {
+       movieMigrationService.migrateMovies();
     }
+
+    @GetMapping(path = "/vote/greater/{vote_count}")
+    public List<Movie> getMovieByVoteCountGreaterThan(@PathVariable("vote_count") int voteCount)
+    {
+        return movieService.getMovieByVoteCountGreaterThan(voteCount);
+    }
+
+    @GetMapping(path = "/vote/less/{vote_count}")
+    public List<Movie> getMoviesByVoteCountIsLessThan(@PathVariable("vote_count") int voteCount)
+    {
+        return movieService.getMoviesByVoteCountIsLessThan(voteCount);
+    }
+
+    @GetMapping(path = "/vote/lesseq/{vote_count}")
+    public List<Movie> getMoviesByVoteCountIsLessThanEqual(@PathVariable("vote_count") int voteCount)
+    {
+        return movieService.getMoviesByVoteCountIsLessThanEqual(voteCount);
+    }
+
+    @GetMapping(path = "/vote/greatereq/{vote_count}")
+    public List<Movie> getMoviesByVoteCountGreaterThanEqual(@PathVariable("vote_count") int voteCount)
+    {
+        return movieService.getMoviesByVoteCountGreaterThanEqual(voteCount);
+    }
+
+    @GetMapping(path = "/overview/contains/{text}")
+    public List<Movie> getMoviesByOverviewContains(@PathVariable("text") String s)
+    {
+        return movieService.getMoviesByOverviewContains(s);
+    }
+
+    @GetMapping(path = "/overview/notcontains/{text}")
+    public List<Movie> getMoviesByOverviewIsNotContaining(@PathVariable("text") String s)
+    {
+        return movieService.getMoviesByOverviewIsNotContaining(s);
+    }
+
+
+
 }
