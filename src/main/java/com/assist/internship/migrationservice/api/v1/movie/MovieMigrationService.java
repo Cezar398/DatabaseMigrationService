@@ -3,14 +3,13 @@ package com.assist.internship.migrationservice.api.v1.movie;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
@@ -29,37 +28,35 @@ public class MovieMigrationService {
     @Value("${custom.migration.password}")
     private String migrationPassword;
 
-    public void migrateMovies() throws JSONException {
+    public void migrateMovies() {
         log.info("Start migration!");
         List<String> idList = getIdList();
 
         List<Movie> movies = new ArrayList<>();
         for (String id : idList) {
             String url = String.format("%s/find/%s?api_key=%s&language=en-US&external_source=imdb_id", baseUrl, id, token);
-            WebClient webClientObj = WebClient.builder().baseUrl(url).build();
-            JSONObject jsonObject = new JSONObject(webClientObj.get().uri("").retrieve().bodyToMono(String.class).block());
-            JSONArray jsonArray = jsonObject.getJSONArray("movie_results");
-            JSONObject movieJson = jsonArray.getJSONObject(0);
-
-            movies.add(getMovie(movieJson));
-
+            Mono<LinkedHashMap> linkedHashMapMono = WebClient.create(url).get().retrieve().bodyToMono(LinkedHashMap.class);
+            LinkedHashMap linkedHashMap = linkedHashMapMono.share().block();
+            ArrayList movie_results = (ArrayList) linkedHashMap.get("movie_results");
+            LinkedHashMap data = (LinkedHashMap) movie_results.get(0);
+            movies.add(getMovie(data));
         }
         movieService.saveMovies(movies);
         log.info("Migration finished!");
     }
 
-    private Movie getMovie(JSONObject movieData) throws JSONException {
+    private Movie getMovie(LinkedHashMap movieData) {
         Movie movie = new Movie();
-        movie.setId(movieData.getString("id"));
-        movie.setTitle(movieData.getString("title"));
-        movie.setOverview(movieData.getString("overview"));
-        movie.setPosterPath(movieData.getString("poster_path"));
-        movie.setMediaType(movieData.getString("media_type"));
-        movie.setPopularity(movieData.getString("popularity"));
-        movie.setReleaseDate(movieData.getString("release_date"));
-        movie.setVideo(movieData.getBoolean("video"));
-        movie.setVoteAverage((float) movieData.getDouble("vote_average"));
-        movie.setVoteCount(movieData.getInt("vote_count"));
+        movie.setId(String.valueOf(movieData.get("id")));
+        movie.setTitle(String.valueOf(movieData.get("title")));
+        movie.setOverview(String.valueOf(movieData.get("overview")));
+        movie.setPosterPath(String.valueOf(movieData.get("poster_path")));
+        movie.setMediaType(String.valueOf(movieData.get("media_type")));
+        movie.setPopularity(String.valueOf(movieData.get("popularity")));
+        movie.setReleaseDate(String.valueOf(movieData.get("release_date")));
+        movie.setVideo((boolean)movieData.get("video"));
+        movie.setVoteAverage((float)((double)movieData.get("vote_average")));
+        movie.setVoteCount((int) movieData.get("vote_count"));
 
         return movie;
     }

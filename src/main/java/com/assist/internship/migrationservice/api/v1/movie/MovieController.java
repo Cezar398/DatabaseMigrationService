@@ -51,43 +51,4 @@ public class MovieController {
     public void migrateMovies() throws JSONException {
        movieMigrationService.migrateMovies();
     }
-
-    @GetMapping(path = "/vote/greater/{vote_count}")
-    public List<Movie> getMovieByVoteCountGreaterThan(@PathVariable("vote_count") int voteCount)
-    {
-        return movieService.getMovieByVoteCountGreaterThan(voteCount);
-    }
-
-    @GetMapping(path = "/vote/less/{vote_count}")
-    public List<Movie> getMoviesByVoteCountIsLessThan(@PathVariable("vote_count") int voteCount)
-    {
-        return movieService.getMoviesByVoteCountIsLessThan(voteCount);
-    }
-
-    @GetMapping(path = "/vote/lesseq/{vote_count}")
-    public List<Movie> getMoviesByVoteCountIsLessThanEqual(@PathVariable("vote_count") int voteCount)
-    {
-        return movieService.getMoviesByVoteCountIsLessThanEqual(voteCount);
-    }
-
-    @GetMapping(path = "/vote/greatereq/{vote_count}")
-    public List<Movie> getMoviesByVoteCountGreaterThanEqual(@PathVariable("vote_count") int voteCount)
-    {
-        return movieService.getMoviesByVoteCountGreaterThanEqual(voteCount);
-    }
-
-    @GetMapping(path = "/overview/contains/{text}")
-    public List<Movie> getMoviesByOverviewContains(@PathVariable("text") String s)
-    {
-        return movieService.getMoviesByOverviewContains(s);
-    }
-
-    @GetMapping(path = "/overview/notcontains/{text}")
-    public List<Movie> getMoviesByOverviewIsNotContaining(@PathVariable("text") String s)
-    {
-        return movieService.getMoviesByOverviewIsNotContaining(s);
-    }
-
-
-
 }
