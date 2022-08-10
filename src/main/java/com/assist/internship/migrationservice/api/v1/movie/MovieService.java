@@ -56,36 +56,6 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public List<Movie> getMovieByVoteCountGreaterThan(int voteCount)
-    {
-        return movieRepository.getMoviesByVoteCountGreaterThan(voteCount);
-    }
-
-    public List<Movie> getMoviesByVoteCountIsLessThan(int voteCount)
-    {
-        return movieRepository.getMoviesByVoteCountIsLessThan(voteCount);
-    }
-
-    public List<Movie> getMoviesByVoteCountGreaterThanEqual(int voteCount)
-    {
-        return movieRepository.getMoviesByVoteCountGreaterThanEqual(voteCount);
-    }
-
-    public List<Movie> getMoviesByVoteCountIsLessThanEqual(int voteCount)
-    {
-        return movieRepository.getMoviesByVoteCountIsLessThanEqual(voteCount);
-    }
-
-    public List<Movie> getMoviesByOverviewContains(String text)
-    {
-        return movieRepository.getMoviesByOverviewContains(text);
-    }
-
-    public List<Movie> getMoviesByOverviewIsNotContaining(String text)
-    {
-        return movieRepository.getMoviesByOverviewIsNotContaining(text);
-    }
-
     private Movie mapToMovie(MovieDto movieDto) {
         Movie movie = new Movie();
         movie.setMediaType(movieDto.getMediaType());
