@@ -1,6 +1,8 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
+import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
+import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +24,9 @@ public class MovieService {
         return movie;
     }
 
-    public List<Movie> getAll() {
-        return movieRepository.findAll();
+    public List<Movie> getAll(MovieSearchCriteria movieSearchCriteria) {
+        MovieSpecification specification = new MovieSpecification(movieSearchCriteria);
+        return movieRepository.findAll(specification);
     }
 
     public Movie getById(String id) {
@@ -50,6 +53,10 @@ public class MovieService {
 
         return movieRepository.save(updatedMovie);
 
+    }
+
+    public void saveMovies(List<Movie> movies) {
+        movieRepository.saveAll(movies);
     }
 
     private Movie mapToMovie(MovieDto movieDto) {
