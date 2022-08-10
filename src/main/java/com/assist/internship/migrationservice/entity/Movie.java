@@ -14,6 +14,7 @@ public class Movie {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
+    private String external_id;
     private String title;
     private String overview;
     @Column(name = "poster_path")

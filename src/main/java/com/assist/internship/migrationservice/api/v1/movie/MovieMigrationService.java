@@ -1,15 +1,15 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
+import com.assist.internship.migrationservice.api.v1.movie.dto.MovieObject;
+import com.assist.internship.migrationservice.api.v1.movie.dto.MovieResponse;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
@@ -19,6 +19,7 @@ import static org.springframework.web.reactive.function.client.ExchangeFilterFun
 @RequiredArgsConstructor
 public class MovieMigrationService {
     private final MovieService movieService;
+    //TODO: Use config properties
     @Value("${custom.migration.baseUrl}")
     private String baseUrl;
     @Value("${custom.migration.token}")
@@ -31,32 +32,36 @@ public class MovieMigrationService {
     public void migrateMovies() {
         log.info("Start migration!");
         List<String> idList = getIdList();
-
-        List<Movie> movies = new ArrayList<>();
-        for (String id : idList) {
-            String url = String.format("%s/find/%s?api_key=%s&language=en-US&external_source=imdb_id", baseUrl, id, token);
-            Mono<LinkedHashMap> linkedHashMapMono = WebClient.create(url).get().retrieve().bodyToMono(LinkedHashMap.class);
-            LinkedHashMap linkedHashMap = linkedHashMapMono.share().block();
-            ArrayList movie_results = (ArrayList) linkedHashMap.get("movie_results");
-            LinkedHashMap data = (LinkedHashMap) movie_results.get(0);
-            movies.add(getMovie(data));
+        if (idList.isEmpty()) {
+            return;
         }
+        List<Movie> movies = new ArrayList<>();
+        idList.stream()
+                .parallel()
+                .forEach(id -> {
+                    log.info("Get info for movie with id:" + id);
+                    //TODO: Use spring cache to impove migration
+                    String url = String.format("%s/find/%s?api_key=%s&language=en-US&external_source=imdb_id", baseUrl, id, token);
+                    //TODO: Create beans for WebClient
+                    MovieResponse movieResponse = WebClient.create(url).get().retrieve().bodyToMono(MovieResponse.class).block();
+                    movies.add(getMovie(movieResponse.getFirst()));
+                });
         movieService.saveMovies(movies);
         log.info("Migration finished!");
     }
 
-    private Movie getMovie(LinkedHashMap movieData) {
+    private Movie getMovie(MovieObject movieData) {
         Movie movie = new Movie();
-        movie.setId(String.valueOf(movieData.get("id")));
-        movie.setTitle(String.valueOf(movieData.get("title")));
-        movie.setOverview(String.valueOf(movieData.get("overview")));
-        movie.setPosterPath(String.valueOf(movieData.get("poster_path")));
-        movie.setMediaType(String.valueOf(movieData.get("media_type")));
-        movie.setPopularity(String.valueOf(movieData.get("popularity")));
-        movie.setReleaseDate(String.valueOf(movieData.get("release_date")));
-        movie.setVideo((boolean)movieData.get("video"));
-        movie.setVoteAverage((float)((double)movieData.get("vote_average")));
-        movie.setVoteCount((int) movieData.get("vote_count"));
+        movie.setExternal_id(String.valueOf(movieData.getId()));
+        movie.setTitle(movieData.getTitle());
+        movie.setOverview(movieData.getOverview());
+        movie.setPosterPath(movieData.getPoster_path());
+        movie.setMediaType(movieData.getMedia_type());
+        movie.setPopularity(String.valueOf(movieData.getPopularity()));
+        movie.setReleaseDate(movieData.getRelease_date());
+        movie.setVideo(movieData.getVideo());
+        movie.setVoteAverage(movieData.getVote_average());
+        movie.setVoteCount(movieData.getVote_count());
 
         return movie;
     }
