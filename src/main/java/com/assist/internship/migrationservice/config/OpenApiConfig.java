@@ -1,4 +1,4 @@
-package com.assist.internship.migrationservice.api.v1;
+package com.assist.internship.migrationservice.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
