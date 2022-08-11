@@ -31,10 +31,9 @@ springdoc:
   api-docs:
     path: /api-docs
 
-custom:
-  migration:
-    baseUrl: ${BASE_URL}
-    token: ${IMDB_TOKEN}
-    username: ${IMDB_USERNAME}
-    password: ${IMDB_PASSWORD}
 
+migration:
+  baseUrl: ${BASE_URL}
+  token: ${IMDB_TOKEN}
+  username: ${IMDB_USERNAME}
+  password: ${IMDB_PASSWORD}
