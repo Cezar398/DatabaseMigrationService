@@ -20,31 +20,33 @@ public class MovieMigrationService {
     private final MovieService movieService;
     private final MigrationConfig migrationConfig;
     private final WebClientService webClientService;
+
     @Cacheable(value = "cacheMigratedMovies")
-    public void migrateMovies() {
+    public void migrateMovies(List<String> idList) {
 
         log.info("Start migration!");
-        List<String> idList = getIdList();
         if (idList.isEmpty()) {
             return;
         }
         List<Movie> movies = new ArrayList<>();
 
-        idList.stream()
-                .parallel()
-                .forEach(id -> {
-                    log.info("Get info for movie with id:" + id);
-                    String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
-                    MovieResponse movieResponse = webClientService.getMovie(url);
-                    movies.add(getMovie(movieResponse.getFirst()));
-                });
+        idList.stream().parallel().forEach(id -> {
+            log.info("Get info for movie with id:" + id);
+            String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
+            MovieResponse movieResponse = webClientService.getMovie(url);
+            movies.add(getMovie(movieResponse.getFirst(), id));
+        });
         movieService.saveMovies(movies);
         log.info("Migration finished!");
     }
 
-    private Movie getMovie(MovieObject movieData) {
+    public void resumeMigration() {
+        migrateMovies(failedMovies());
+    }
+
+    private Movie getMovie(MovieObject movieData, String id) {
         Movie movie = new Movie();
-        movie.setExternal_id(String.valueOf(movieData.getId()));
+        movie.setExternal_id(id);
         movie.setTitle(movieData.getTitle());
         movie.setOverview(movieData.getOverview());
         movie.setPosterPath(movieData.getPoster_path());
@@ -56,6 +58,28 @@ public class MovieMigrationService {
         movie.setVoteCount(movieData.getVote_count());
 
         return movie;
+    }
+
+    public List<String> failedMovies() {
+        int failNumber = 0;
+        List<String> idList = getIdList();
+        List<String> notFoundIdList = new ArrayList<>();
+        List<Movie> movies = movieService.findAll();
+        for (String id : idList) {
+            Boolean isFound = false;
+            for (Movie movie : movies) {
+                if (movie.getExternal_id().equals(id)) {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            if (!isFound) {
+                notFoundIdList.add(id);
+            }
+        }
+
+        return notFoundIdList;
     }
 
     @Cacheable(value = "cacheIdList")

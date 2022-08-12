@@ -11,14 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.io.ICsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -123,7 +118,7 @@ public class MovieController {
     @Operation(summary = "Start migration service", description = "We can start migration service by pressing \"Execute\". After press, migration will start. Now, movies from imdb will be migrated to our database")
     @PostMapping(path = "/migrate")
     public void migrateMovies() {
-        movieMigrationService.migrateMovies();
+        movieMigrationService.migrateMovies(movieMigrationService.getIdList());
     }
 
     @Operation(summary = "Export csv", description = "Export movie database to .csv file")
@@ -136,24 +131,32 @@ public class MovieController {
     })
     @GetMapping(value = "/export")
     public void exportToCSV(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
+        movieService.exportToCSV(response);
+    }
 
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        String currentDateTIme = dateFormat.format(new Date());
+    @Operation(summary = "Get failed migrations", description = "Get failed migrations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies found"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @GetMapping(value = "/failed")
+    public List<String> failedMovies() {
+        return movieMigrationService.failedMovies();
+    }
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=\"movies_" + currentDateTIme + ".csv\"";
-        response.setHeader(headerKey, headerValue);
-
-        List<Movie> movieList = movieService.findAll();
-
-        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-        String[] csvHeader = {"id", "title", "overview", "vote_count", "vote_average", "release_date"};
-        String[] nameMapping = {"id", "title", "overview", "voteCount", "voteAverage", "releaseDate"};
-        csvWriter.writeHeader(csvHeader);
-        for (Movie movie : movieList) {
-            csvWriter.write(movie, nameMapping);
-        }
-        csvWriter.close();
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies migrated"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @Operation(summary = "Resume migrations", description = "Resume migrations")
+    @PostMapping(value = "/resume")
+    public void resumeMigration() {
+        movieMigrationService.resumeMigration();
     }
 }
