@@ -73,7 +73,6 @@ public class MovieMigrationService {
                     break;
                 }
             }
-
             if (!isFound) {
                 notFoundIdList.add(id);
             }

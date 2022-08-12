@@ -47,6 +47,28 @@ public class CountryService {
         return country;
     }
 
+    public void deleteAll()
+    {
+        countryRepository.deleteAll();
+    }
+
+    public void deleteById(String id)
+    {
+        countryRepository.deleteById(id);
+    }
+
+    /*
+    TODO:
+    public void removeMovieFromCountry(CreateCountryDto countryDto)
+    {
+        Country country = findById(countryDto.getCountryId());
+        Movie movie = movieService.findById(countryDto.getMovieId());
+        country.getMovieList().remove(movie);
+        movie.getCountries().remove(country);
+        countryRepository.save(country);
+        movieService.save(movie);
+    }*/
+
     private Country mapToCountry(CountryDto countryDto) {
         Country country = new Country();
         country.setName(countryDto.getName());

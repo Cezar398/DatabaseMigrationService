@@ -65,4 +65,26 @@ public class CountryController {
         return countryService.addMovieToCountry(countryDto);
     }
 
+    @DeleteMapping
+    public void deleteAll()
+    {
+        countryService.deleteAll();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") String id)
+    {
+        countryService.deleteById(id);
+    }
+
+
+  /*
+  TODO:
+  @PostMapping("/remove")
+    public void removeMovieFromCountry(@RequestBody CreateCountryDto countryDto)
+    {
+        countryService.removeMovieFromCountry(countryDto);
+    }*/
+
+
 }

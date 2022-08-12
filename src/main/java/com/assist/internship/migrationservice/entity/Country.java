@@ -19,6 +19,6 @@ public class Country {
     @Column(name = "name")
     private String name;
     @JsonIgnore
-    @ManyToMany(mappedBy = "countries", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "countries")
     private List<Movie> movieList = new ArrayList<>();
 }
