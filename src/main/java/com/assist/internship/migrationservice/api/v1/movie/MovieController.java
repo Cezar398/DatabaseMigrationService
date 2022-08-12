@@ -11,19 +11,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/movie")
 @RequiredArgsConstructor
-
 @Tag(description = "Movies resources that provides access to available movies", name = "Movie Resource")
 public class MovieController {
-
     private final MovieService movieService;
     private final MovieMigrationService movieMigrationService;
-
 
     @Operation(summary = "Add movie", description = "Add movie to the database and return it")
     @ApiResponses(value = {
@@ -66,7 +70,7 @@ public class MovieController {
     @Operation(summary = "Get mvoie", description = "Get movie by id from database")
     @GetMapping(path = "/{id}")
     public Movie getById(@Parameter(description = "The id for movie which will be selected") @PathVariable("id") String id) {
-        return movieService.getById(id);
+        return movieService.findById(id);
     }
 
     @ApiResponses(value = {
@@ -120,5 +124,36 @@ public class MovieController {
     @PostMapping(path = "/migrate")
     public void migrateMovies() {
         movieMigrationService.migrateMovies();
+    }
+
+    @Operation(summary = "Export csv", description = "Export movie database to .csv file")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies found"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @GetMapping(value = "/export")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+        String currentDateTIme = dateFormat.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=\"movies_" + currentDateTIme + ".csv\"";
+        response.setHeader(headerKey, headerValue);
+
+        List<Movie> movieList = movieService.findAll();
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+        String[] csvHeader = {"id", "title", "overview", "vote_count", "vote_average", "release_date"};
+        String[] nameMapping = {"id", "title", "overview", "voteCount", "voteAverage", "releaseDate"};
+        csvWriter.writeHeader(csvHeader);
+        for (Movie movie : movieList) {
+            csvWriter.write(movie, nameMapping);
+        }
+        csvWriter.close();
     }
 }

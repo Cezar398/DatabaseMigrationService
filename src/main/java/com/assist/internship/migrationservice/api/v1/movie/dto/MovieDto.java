@@ -1,5 +1,6 @@
 package com.assist.internship.migrationservice.api.v1.movie.dto;
 
+import com.assist.internship.migrationservice.entity.Movie;
 import lombok.Data;
 
 @Data
@@ -13,4 +14,5 @@ public class MovieDto {
     private Boolean video;
     private Float voteAverage;
     private Integer voteCount;
-    }
+
+}

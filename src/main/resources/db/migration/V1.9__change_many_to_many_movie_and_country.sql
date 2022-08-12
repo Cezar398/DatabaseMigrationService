@@ -1,0 +1,1 @@
+ALTER TABLE public.movie_country ALTER COLUMN country_id TYPE varchar(255);

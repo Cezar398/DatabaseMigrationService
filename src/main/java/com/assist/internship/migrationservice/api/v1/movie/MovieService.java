@@ -29,7 +29,11 @@ public class MovieService {
         return movieRepository.findAll(specification);
     }
 
-    public Movie getById(String id) {
+    public List<Movie> findAll(){
+        return movieRepository.findAll();
+    }
+
+    public Movie findById(String id) {
         return movieRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
     }
@@ -53,6 +57,16 @@ public class MovieService {
 
         return movieRepository.save(updatedMovie);
 
+    }
+
+    public Movie getReferenceById(String id) {
+        return movieRepository.getReferenceById(id);
+    }
+
+    public Movie save(Movie movie)
+    {
+        movieRepository.save(movie);
+        return movie;
     }
 
     public void saveMovies(List<Movie> movies) {
