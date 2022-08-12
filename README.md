@@ -1,4 +1,4 @@
-![App Screenshot](	https://github-readme-stats.vercel.app/api?username=Cezar398&theme=blue-green)
+![App Screenshot](	https://github-readme-stats.vercel.app/api?username=Cezar398&theme=blue-light)
 
 
 ![App Screenshot](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
