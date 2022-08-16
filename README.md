@@ -104,15 +104,15 @@ Movie service offer multiple endpoints for manipulate movies, export database to
 
 To run this project, you will need to add the following environment variables to your application.yaml file
 
-| Parameter        | Description                                                    |
-|:-----------------|:---------------------------------------------------------------|
-| `${DB_HOST}`     | Your database host(`example: localhost`                        |
-| `${DB_USERNAME}` | Your database user(`example: root`                             |
-| `${DB_PASSWORD}` | Your database password(`example: root`                         |
-| `${BASE_URL}`    | Your application base url(`example: http://localhost`)         |
-| `${IMDB_TOKEN}`        | Your imdb token(`STRING_TOKEN`)                                |
-| `${IMDB_USERNAME}`    | Your application port(`user`)                                  |
-| `${IMDB_PASSWORD}`    | Your application port(`password`)                              |     
+| Parameter        | Description                                            |
+|:-----------------|:-------------------------------------------------------|
+| `${DB_HOST}`     | Your database host(`example: localhost`                |
+| `${DB_USERNAME}` | Your database user(`example: root`                     |
+| `${DB_PASSWORD}` | Your database password(`example: root`                 |
+| `${BASE_URL}`    | Your application base url(`example: http://localhost`) |
+| `${IMDB_TOKEN}`        | Your imdb token(`STRING_TOKEN`)                        |
+| `${IMDB_USERNAME}`    | Your imdb user(`example: user`)                        |
+| `${IMDB_PASSWORD}`    | Your imdb password(`example: password`)                |     
 
 
 
