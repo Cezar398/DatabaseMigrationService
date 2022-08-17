@@ -17,6 +17,7 @@ import java.util.List;
 public class CountryService {
     private final CountryRepository countryRepository;
     private final MovieService movieService;
+    //TODO: remove unused variable
     private final EntityManager entityManager;
 
     public List<Country> getAllCountries() {
@@ -47,13 +48,11 @@ public class CountryService {
         return country;
     }
 
-    public void deleteAll()
-    {
+    public void deleteAll() {
         countryRepository.deleteAll();
     }
 
-    public void deleteById(String id)
-    {
+    public void deleteById(String id) {
         countryRepository.deleteById(id);
     }
 
