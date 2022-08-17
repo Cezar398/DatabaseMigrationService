@@ -3,19 +3,21 @@ package com.assist.internship.migrationservice.api.v1.movie;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
+import com.assist.internship.migrationservice.config.properties.ExportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.io.ICsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Date;
+import java.io.PrintWriter;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovieService {
     private final MovieRepository movieRepository;
+    private final ExportConfig exportConfig;
 
     public Movie create(MovieDto movieDto) {
         Movie movie = mapToMovie(movieDto);
@@ -63,10 +66,6 @@ public class MovieService {
 
     }
 
-    public Movie getReferenceById(String id) {
-        return movieRepository.getReferenceById(id);
-    }
-
     public Movie save(Movie movie) {
         movieRepository.save(movie);
         return movie;
@@ -76,29 +75,28 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
+    public void exportToCSV(HttpServletResponse response) throws IOException{
+        response.setContentType(exportConfig.getContentType());
+        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + "_movie" + exportConfig.getFileFormat());
 
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        String currentDateTIme = dateFormat.format(new Date());
+        PrintWriter printWriter = new PrintWriter(response.getWriter());
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=\"movies_" + currentDateTIme + ".csv\"";
-        response.setHeader(headerKey, headerValue);
+        CSVPrinter csvPrinter = new CSVPrinter(printWriter, CSVFormat.EXCEL.withHeader("ID", "Title", "Popularity"));
 
-        List<Movie> movieList = movieRepository.findAll();
+        List<Movie> movies = findAll();
 
-        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-        String[] csvHeader = {"id", "title", "overview", "vote_count", "vote_average", "release_date"};
-        String[] nameMapping = {"id", "title", "overview", "voteCount", "voteAverage", "releaseDate"};
-        csvWriter.writeHeader(csvHeader);
-        for (Movie movie : movieList) {
-            csvWriter.write(movie, nameMapping);
+        for(Movie movie : movies)
+        {
+            csvPrinter.printRecord(movie.getId(), movie.getTitle(), movie.getPopularity());
         }
-        csvWriter.close();
+
+        csvPrinter.flush();
     }
 
-
+    public Page<Movie> findMovieByReleaseDateOrderByReleaseDateDesc() {
+        Pageable pageable = PageRequest.of(0, 10);
+        return movieRepository.findAll(pageable);
+    }
 
     private Movie mapToMovie(MovieDto movieDto) {
         Movie movie = new Movie();

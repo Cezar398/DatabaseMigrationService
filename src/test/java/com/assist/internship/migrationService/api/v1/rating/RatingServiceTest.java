@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = {RatingService.class})
 @ExtendWith(SpringExtension.class)
 class RatingServiceTest {
     @MockBean
@@ -49,8 +47,8 @@ class RatingServiceTest {
     void testCreateRating() {
         Movie movie = new Movie();
         movie.setCountries(new ArrayList<>());
-        movie.setExternal_id("External id");
-        movie.setId("42");
+        movie.setExternalId("External id");
+        movie.setId(42l);
         movie.setMediaType("Media Type");
         movie.setOverview("Overview");
         movie.setPopularity("Popularity");
@@ -71,8 +69,8 @@ class RatingServiceTest {
 
         Movie movie1 = new Movie();
         movie1.setCountries(new ArrayList<>());
-        movie1.setExternal_id("External id");
-        movie1.setId("42");
+        movie1.setExternalId("External id");
+        movie1.setId(42l);
         movie1.setMediaType("Media Type");
         movie1.setOverview("Overview");
         movie1.setPopularity("Popularity");

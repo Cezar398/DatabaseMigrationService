@@ -77,14 +77,4 @@ public class CountryController {
         countryService.deleteById(id);
     }
 
-
-  /*
-  TODO:
-  @PostMapping("/remove")
-    public void removeMovieFromCountry(@RequestBody CreateCountryDto countryDto)
-    {
-        countryService.removeMovieFromCountry(countryDto);
-    }*/
-
-
 }

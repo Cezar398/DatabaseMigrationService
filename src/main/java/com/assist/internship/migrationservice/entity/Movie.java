@@ -1,7 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,10 +11,10 @@ import java.util.List;
 @Table(name = "movie")
 public class Movie {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
-    private String external_id;
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "movie_seq")
+    private Long id;
+    @Column(name = "external_id")
+    private String externalId;
     private String title;
     private String overview;
     @Column(name = "poster_path")

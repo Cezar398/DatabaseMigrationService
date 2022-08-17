@@ -1,0 +1,1 @@
+ALTER TABLE public.movie_country ALTER COLUMN country_id TYPE bigint USING (country_id::bigint);
