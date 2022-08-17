@@ -6,9 +6,10 @@ import com.assist.internship.migrationservice.entity.Movie;
 import com.assist.internship.migrationservice.entity.Rating;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,61 +17,56 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class RatingServiceTest {
-    @MockBean
+    @Mock
     private MovieService movieService;
 
-    @MockBean
+    @Mock
     private RatingRepository ratingRepository;
 
-    @Autowired
+    @InjectMocks
     private RatingService ratingService;
 
-    /**
-     * Method under test: {@link RatingService#getAll()}
-     */
     @Test
-    void testGetAll() {
-        ArrayList<Rating> ratingList = new ArrayList<>();
-        when(ratingRepository.findAll()).thenReturn(ratingList);
-        List<Rating> actualAll = ratingService.getAll();
-        assertSame(ratingList, actualAll);
-        assertTrue(actualAll.isEmpty());
-        verify(ratingRepository).findAll();
+    void getAll_shouldReturnRatings() {
+        when(ratingRepository.findAll()).thenReturn(List.of(getRatingMock()));
+
+        List<Rating> result = ratingService.getAll();
+        assertFalse(result.isEmpty());
     }
 
-    /**
-     * Method under test: {@link RatingService#createRating(RatingDto)}
-     */
     @Test
-    void testCreateRating() {
-        Movie movie = new Movie();
-        movie.setCountries(new ArrayList<>());
-        movie.setExternalId("External id");
-        movie.setId(42l);
-        movie.setMediaType("Media Type");
-        movie.setOverview("Overview");
-        movie.setPopularity("Popularity");
-        movie.setPosterPath("Poster Path");
-        movie.setRatings(new ArrayList<>());
-        movie.setReleaseDate("2020-03-01");
-        movie.setTitle("Dr");
-        movie.setVideo(true);
-        movie.setVoteAverage(10.0f);
-        movie.setVoteCount(3);
+    void createRating_shouldSucceed() {
+        when(ratingRepository.save(any())).thenReturn(getRatingMock());
+        Movie mockMovie = getMovieMock();
+        when(movieService.findById(anyString())).thenReturn(mockMovie);
+        RatingDto ratingDto = getRatingDtoMock();
 
-        Rating rating = new Rating();
-        rating.setId("42");
-        rating.setMovie(movie);
-        rating.setRate(1);
-        rating.setRateContent("Not all who wander are lost");
-        when(ratingRepository.save((Rating) any())).thenReturn(rating);
+        Rating result = ratingService.createRating(ratingDto);
+        assertEquals("Not all who wander are lost", result.getRateContent());
+        assertEquals(1, result.getRate());
+        assertSame(mockMovie, result.getMovie());
+        verify(ratingRepository).save(any());
+        ArgumentCaptor<String> findByIdArg = ArgumentCaptor.forClass(String.class);
+        verify(movieService, times(1)).findById(findByIdArg.capture());
+        assertEquals(ratingDto.getMovieId(), findByIdArg.getValue());
+    }
 
+    private static RatingDto getRatingDtoMock() {
+        RatingDto ratingDto = new RatingDto();
+        ratingDto.setContent("Not all who wander are lost");
+        ratingDto.setMovieId("42");
+        ratingDto.setRate(1);
+
+        return ratingDto;
+    }
+
+    private static Movie getMovieMock() {
         Movie movie1 = new Movie();
         movie1.setCountries(new ArrayList<>());
         movie1.setExternalId("External id");
-        movie1.setId(42l);
+        movie1.setId(42L);
         movie1.setMediaType("Media Type");
         movie1.setOverview("Overview");
         movie1.setPopularity("Popularity");
@@ -81,18 +77,19 @@ class RatingServiceTest {
         movie1.setVideo(true);
         movie1.setVoteAverage(10.0f);
         movie1.setVoteCount(3);
-        when(movieService.findById((String) any())).thenReturn(movie1);
 
-        RatingDto ratingDto = new RatingDto();
-        ratingDto.setContent("Not all who wander are lost");
-        ratingDto.setMovieId("42");
-        ratingDto.setRate(1);
-        Rating actualCreateRatingResult = ratingService.createRating(ratingDto);
-        assertEquals("Not all who wander are lost", actualCreateRatingResult.getRateContent());
-        assertEquals(1, actualCreateRatingResult.getRate());
-        assertSame(movie1, actualCreateRatingResult.getMovie());
-        verify(ratingRepository).save((Rating) any());
-        verify(movieService).findById((String) any());
+        return movie1;
+    }
+
+    private static Rating getRatingMock() {
+        Movie movie = getMovieMock();
+        Rating rating = new Rating();
+        rating.setId(42L);
+        rating.setMovie(movie);
+        rating.setRate(1);
+        rating.setRateContent("Not all who wander are lost");
+
+        return rating;
     }
 }
 
