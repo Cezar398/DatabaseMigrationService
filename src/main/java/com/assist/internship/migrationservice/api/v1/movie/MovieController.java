@@ -49,6 +49,7 @@ public class MovieController {
 
     @GetMapping()
     public List<Movie> getAll(@ParameterObject MovieSearchCriteria criteria) {
+        //TODO: return list of movies without ratings and countries
         MovieSearchCriteria movieSearchCriteria = MovieSearchCriteria.builder()
                 .title(criteria.getTitle())
                 .overview(criteria.getOverview())
@@ -166,7 +167,7 @@ public class MovieController {
     }
 
     @GetMapping("/last10/")
-    public Page<Movie> getLastTen(){
+    public Page<Movie> getLastTen() {
         return movieService.findMovieByReleaseDateOrderByReleaseDateDesc();
     }
 }
