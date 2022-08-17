@@ -1,86 +1,84 @@
 package com.assist.internship.migrationservice.api.v1.rating;
 
 import com.assist.internship.migrationservice.api.v1.rating.dto.RatingDto;
+import com.assist.internship.migrationservice.entity.Rating;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(classes = {RatingController.class})
+//@ContextConfiguration(classes = {RatingController.class})
+@WebMvcTest(RatingController.class)
 @ExtendWith(SpringExtension.class)
 class RatingControllerTest {
     //TODO: update unit tests for this controller
     @Autowired
-    private RatingController ratingController;
+    private MockMvc mockMvc;
 
     @MockBean
     private RatingService ratingService;
 
-    /**
-     * Method under test: {@link RatingController#createRating(RatingDto)}
-     */
     @Test
-    void testCreateRating() throws Exception {
-        when(ratingService.getAll()).thenReturn(new ArrayList<>());
+    void createRating_ShouldCreateRating() throws Exception {
+        Rating rating = getRating();
 
+        Mockito.when(ratingService.createRating(any())).thenReturn(rating);
+
+        RatingDto ratingDto = getRatingDto();
+        String content = (new ObjectMapper()).writeValueAsString(ratingDto);
+
+        mockMvc.perform(post("/api/v1/rating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getAll_ShouldReturnAllRatings() throws Exception {
+        Rating rating = getRating();
+
+        List<Rating> ratingList = Arrays.asList(rating);
+        Mockito.when(ratingService.getAll()).thenReturn(ratingList);
+
+        mockMvc.perform(get("/api/v1/rating"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id", Matchers.is(1)))
+                .andExpect(jsonPath("$[0].rateContent", Matchers.is("Rate content")))
+                .andExpect(jsonPath("$[0].rate", Matchers.is(10)));
+    }
+
+    private static RatingDto getRatingDto() {
         RatingDto ratingDto = new RatingDto();
         ratingDto.setContent("Not all who wander are lost");
         ratingDto.setMovieId("42");
         ratingDto.setRate(1);
-        String content = (new ObjectMapper()).writeValueAsString(ratingDto);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/rating")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MockMvcBuilders.standaloneSetup(ratingController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(content().string("[]"))
-                .andExpect(jsonPath("$.rate").doesNotExist());
+        return ratingDto;
     }
 
-    /**
-     * Method under test: {@link RatingController#getAll()}
-     */
-    @Test
-    void testGetAll() throws Exception {
-        when(ratingService.getAll()).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/rating");
-        MockMvcBuilders.standaloneSetup(ratingController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(content().string("[]"));
+    private static Rating getRating() {
+        Rating rating = new Rating();
+        rating.setId(1L);
+        rating.setRateContent("Rate content");
+        rating.setRate(10);
+        return rating;
     }
 
-    /**
-     * Method under test: {@link RatingController#getAll()}
-     */
-    @Test
-    void testGetAll2() throws Exception {
-        when(ratingService.getAll()).thenReturn(new ArrayList<>());
-        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/api/v1/rating");
-        getResult.characterEncoding("Encoding");
-        MockMvcBuilders.standaloneSetup(ratingController)
-                .build()
-                .perform(getResult)
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(content().string("[]"));
-    }
 }
 
