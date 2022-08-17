@@ -34,7 +34,9 @@ public class MovieMigrationService {
     private List<Movie> getMovies(List<String> idList) {
         List<Movie> movies = new ArrayList<>();
 
+        //TODO: improve parallel processing
         idList.stream().parallel().forEach(id -> {
+            //TODO: extract to a separate method
             String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
             MovieResponse movieResponse = webClientService.getMovie(url);
             movies.add(getMovie(movieResponse.getFirst(), id));
@@ -68,6 +70,7 @@ public class MovieMigrationService {
     }
 
     public List<String> getFailedMovies() {
+        //TODO: remove this method
         return failedMovies();
     }
 
@@ -75,6 +78,7 @@ public class MovieMigrationService {
         List<String> idList = getIdList();
         List<String> notFoundIdList = new ArrayList<>();
         List<Movie> movies = movieService.findAll();
+        //TODO: re-write the way you populate addedIds using Java 8 stream features
         List<String> addedIds = new ArrayList<>();
 
         movies.stream().forEach(movie -> {

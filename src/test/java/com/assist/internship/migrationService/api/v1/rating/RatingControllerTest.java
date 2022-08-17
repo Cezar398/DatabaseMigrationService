@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {RatingController.class})
 @ExtendWith(SpringExtension.class)
 class RatingControllerTest {
+    //TODO: update unit tests for this controller
     @Autowired
     private RatingController ratingController;
 

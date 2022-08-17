@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {MovieController.class})
 @ExtendWith(SpringExtension.class)
 class MovieControllerTest {
+    //TODO: Refactor unit tests - method naming, split logic, etc.
     @Autowired
     private MovieController movieController;
 

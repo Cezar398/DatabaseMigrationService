@@ -67,15 +67,14 @@ public class MovieService {
     }
 
     public Movie save(Movie movie) {
-        movieRepository.save(movie);
-        return movie;
+        return movieRepository.save(movie);
     }
 
     public void saveMovies(List<Movie> movies) {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) throws IOException{
+    public void exportToCSV(HttpServletResponse response) throws IOException {
         response.setContentType(exportConfig.getContentType());
         response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + "_movie" + exportConfig.getFileFormat());
 
@@ -85,8 +84,7 @@ public class MovieService {
 
         List<Movie> movies = findAll();
 
-        for(Movie movie : movies)
-        {
+        for (Movie movie : movies) {
             csvPrinter.printRecord(movie.getId(), movie.getTitle(), movie.getPopularity());
         }
 
