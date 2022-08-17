@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,9 +23,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(classes = {RatingController.class})
-@WebMvcTest(RatingController.class)
 @ExtendWith(SpringExtension.class)
+@WebMvcTest(RatingController.class)
 class RatingControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -44,8 +42,8 @@ class RatingControllerTest {
         String content = (new ObjectMapper()).writeValueAsString(ratingDto);
 
         mockMvc.perform(post("/api/v1/rating")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
                 .andExpect(status().isOk());
     }
 
