@@ -2,7 +2,6 @@ package com.assist.internship.migrationservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -11,9 +10,8 @@ import javax.persistence.*;
 @Table(name = "rating")
 public class Rating {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "rating_seq")
+    private Long id;
     @Column(name = "content")
     private String rateContent;
     @Column(name = "rate")

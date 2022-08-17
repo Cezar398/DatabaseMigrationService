@@ -55,8 +55,8 @@ class MovieControllerTest {
     void testExportToCSV2() throws Exception {
         Movie movie = new Movie();
         movie.setCountries(new ArrayList<>());
-        movie.setExternal_id("?");
-        movie.setId("42");
+        movie.setExternalId("?");
+        movie.setId(42l);
         movie.setMediaType("?");
         movie.setOverview("?");
         movie.setPopularity("?");
@@ -89,8 +89,8 @@ class MovieControllerTest {
     void testExportToCSV3() throws Exception {
         Movie movie = new Movie();
         movie.setCountries(new ArrayList<>());
-        movie.setExternal_id("?");
-        movie.setId("42");
+        movie.setExternalId("?");
+        movie.setId(42l);
         movie.setMediaType("?");
         movie.setOverview("?");
         movie.setPopularity("?");
@@ -104,8 +104,8 @@ class MovieControllerTest {
 
         Movie movie1 = new Movie();
         movie1.setCountries(new ArrayList<>());
-        movie1.setExternal_id("?");
-        movie1.setId("42");
+        movie1.setExternalId("?");
+        movie1.setId(42l);
         movie1.setMediaType("?");
         movie1.setOverview("?");
         movie1.setPopularity("?");

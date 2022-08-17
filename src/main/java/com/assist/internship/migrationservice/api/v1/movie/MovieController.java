@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping(value = "/api/v1/movie")
 @RequiredArgsConstructor
 @Tag(description = "Movies resources that provides access to available movies", name = "Movie Resource")
@@ -118,7 +121,7 @@ public class MovieController {
     @Operation(summary = "Start migration service", description = "We can start migration service by pressing \"Execute\". After press, migration will start. Now, movies from imdb will be migrated to our database")
     @PostMapping(path = "/migrate")
     public void migrateMovies() {
-        movieMigrationService.migrateMovies(movieMigrationService.getIdList());
+        movieMigrationService.migrateMovies();
     }
 
     @Operation(summary = "Export csv", description = "Export movie database to .csv file")
@@ -144,7 +147,8 @@ public class MovieController {
     })
     @GetMapping(value = "/failed")
     public List<String> failedMovies() {
-        return movieMigrationService.failedMovies();
+        List<String> ids = movieMigrationService.getFailedMovies();
+        return ids;
     }
 
     @ApiResponses(value = {
@@ -158,5 +162,10 @@ public class MovieController {
     @PostMapping(value = "/resume")
     public void resumeMigration() {
         movieMigrationService.resumeMigration();
+    }
+
+    @GetMapping("/last10/")
+    public Page<Movie> getLastTen(){
+        return movieService.findMovieByReleaseDateOrderByReleaseDateDesc();
     }
 }

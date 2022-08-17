@@ -37,3 +37,10 @@ migration:
   token: ${IMDB_TOKEN}
   username: ${IMDB_USERNAME}
   password: ${IMDB_PASSWORD}
+
+export-csv:
+  headerKey: Content-Disposition
+  headerValue: attachment; filename=\
+  fileFormat: .csv
+  contentType: text/csv
+

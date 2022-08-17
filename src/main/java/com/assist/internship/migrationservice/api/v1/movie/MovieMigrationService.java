@@ -22,31 +22,38 @@ public class MovieMigrationService {
     private final WebClientService webClientService;
 
     @Cacheable(value = "cacheMigratedMovies")
-    public void migrateMovies(List<String> idList) {
-
-        log.info("Start migration!");
+    public void migrateMovies() {
+        List<String> idList = getIdList();
         if (idList.isEmpty()) {
             return;
         }
+        List<Movie> movies = getMovies(idList);
+        movieService.saveMovies(movies);
+    }
+
+    private List<Movie> getMovies(List<String> idList) {
         List<Movie> movies = new ArrayList<>();
 
         idList.stream().parallel().forEach(id -> {
-            log.info("Get info for movie with id:" + id);
             String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
             MovieResponse movieResponse = webClientService.getMovie(url);
             movies.add(getMovie(movieResponse.getFirst(), id));
         });
-        movieService.saveMovies(movies);
-        log.info("Migration finished!");
+        return movies;
     }
 
     public void resumeMigration() {
-        migrateMovies(failedMovies());
+        List<String> idList = failedMovies();
+        if (idList.isEmpty()) {
+            return;
+        }
+        List<Movie> movies = getMovies(idList);
+        movieService.saveMovies(movies);
     }
 
     private Movie getMovie(MovieObject movieData, String id) {
         Movie movie = new Movie();
-        movie.setExternal_id(id);
+        movie.setExternalId(id);
         movie.setTitle(movieData.getTitle());
         movie.setOverview(movieData.getOverview());
         movie.setPosterPath(movieData.getPoster_path());
@@ -60,29 +67,30 @@ public class MovieMigrationService {
         return movie;
     }
 
-    public List<String> failedMovies() {
-        int failNumber = 0;
+    public List<String> getFailedMovies() {
+        return failedMovies();
+    }
+
+    private List<String> failedMovies() {
         List<String> idList = getIdList();
         List<String> notFoundIdList = new ArrayList<>();
         List<Movie> movies = movieService.findAll();
-        for (String id : idList) {
-            Boolean isFound = false;
-            for (Movie movie : movies) {
-                if (movie.getExternal_id().equals(id)) {
-                    isFound = true;
-                    break;
-                }
-            }
-            if (!isFound) {
+        List<String> addedIds = new ArrayList<>();
+
+        movies.stream().forEach(movie -> {
+            addedIds.add(movie.getExternalId());
+        });
+
+        idList.stream().forEach(id -> {
+            if (!addedIds.contains(id)) {
                 notFoundIdList.add(id);
             }
-        }
+        });
 
         return notFoundIdList;
     }
 
-    @Cacheable(value = "cacheIdList")
-    public List<String> getIdList() {
+    private List<String> getIdList() {
         return webClientService.getIds("/api/v1/movie/imdb/ids");
     }
 }

@@ -41,6 +41,7 @@ public class MovieSpecification implements Specification<Movie> {
         if(criteria.getOverview() != null) {
             predicateList.add(builder.like(root.get("overview"), "%" + criteria.getOverview() + "%"));
         }
+
         return builder.and(predicateList.toArray(new Predicate[0]));
     }
 

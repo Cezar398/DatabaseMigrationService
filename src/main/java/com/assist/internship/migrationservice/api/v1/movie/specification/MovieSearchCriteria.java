@@ -12,10 +12,10 @@ import lombok.*;
 public class MovieSearchCriteria {
     @Parameter(in = ParameterIn.QUERY,description = "Movie title")
     private String title;
-    @Parameter(in = ParameterIn.QUERY,description = "Moview title")
+    @Parameter(in = ParameterIn.QUERY,description = "Vote count")
     private Integer voteCount;
-    @Parameter(in = ParameterIn.QUERY,description = "Moview title")
+    @Parameter(in = ParameterIn.QUERY,description = "Voate average")
     private Float voteAverage;
-    @Parameter(in = ParameterIn.QUERY,description = "Moview title")
+    @Parameter(in = ParameterIn.QUERY,description = "Overview")
     private String overview;
 }
