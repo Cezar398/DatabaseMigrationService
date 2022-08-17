@@ -92,6 +92,7 @@ public class MovieService {
     }
 
     public Page<Movie> findMovieByReleaseDateOrderByReleaseDateDesc() {
+        //TODO: refactor, page it's used for pagination not to limit the result number
         Pageable pageable = PageRequest.of(0, 10);
         return movieRepository.findAll(pageable);
     }
