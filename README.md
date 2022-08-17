@@ -114,7 +114,22 @@ To run this project, you will need to add the following environment variables to
 | `${IMDB_USERNAME}`    | Your imdb user(`example: user`)                        |
 | `${IMDB_PASSWORD}`    | Your imdb password(`example: password`)                |     
 
+## New Features
 
-
+* POST Import movies endpoint - new endpoint that will allow importing movies through csv file
+* GET movies with pagination and order by a specific field - new endpoint for movies
+* Movie Crew - CRUD endpoints:
+    * First Name
+    * Last Name
+    * Birth Date
+    * Contracts:
+        * Start Date - the start date of the contract
+        * End Date - the end date of the contract
+        * Movie
+* GET crew that was hired in a specific period
+* GET crew that was in a specific country
+* Schedule movies migration on a configured time
+* Keep tracking of the triggered migrations - persist the time when a migration was started, duration, how triggered the migration
+* Secure endpoints - secure all endpoints except GET endpoints that can be accessed by anyone
 
 
