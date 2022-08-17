@@ -25,10 +25,11 @@ public class RatingController {
         return ratingService.getAll();
     }
 
-    @Operation(summary = "Add rating", description = "Create rating for a moie")
+    @Operation(summary = "Add rating", description = "Create rating for a movie")
     @PostMapping
     public Rating createRating(@Parameter(description = "Rating data, id -> Movie id, rateContent -> What rating contains, rate -> Rate score") @RequestBody RatingDto ratingDto)
     {
        return ratingService.createRating(ratingDto);
     }
 }
+

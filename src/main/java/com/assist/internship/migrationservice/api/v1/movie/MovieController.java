@@ -12,18 +12,17 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/movie")
 @RequiredArgsConstructor
-
 @Tag(description = "Movies resources that provides access to available movies", name = "Movie Resource")
 public class MovieController {
-
     private final MovieService movieService;
     private final MovieMigrationService movieMigrationService;
-
 
     @Operation(summary = "Add movie", description = "Add movie to the database and return it")
     @ApiResponses(value = {
@@ -66,7 +65,7 @@ public class MovieController {
     @Operation(summary = "Get mvoie", description = "Get movie by id from database")
     @GetMapping(path = "/{id}")
     public Movie getById(@Parameter(description = "The id for movie which will be selected") @PathVariable("id") String id) {
-        return movieService.getById(id);
+        return movieService.findById(id);
     }
 
     @ApiResponses(value = {
@@ -119,6 +118,45 @@ public class MovieController {
     @Operation(summary = "Start migration service", description = "We can start migration service by pressing \"Execute\". After press, migration will start. Now, movies from imdb will be migrated to our database")
     @PostMapping(path = "/migrate")
     public void migrateMovies() {
-        movieMigrationService.migrateMovies();
+        movieMigrationService.migrateMovies(movieMigrationService.getIdList());
+    }
+
+    @Operation(summary = "Export csv", description = "Export movie database to .csv file")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies found"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @GetMapping(value = "/export")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        movieService.exportToCSV(response);
+    }
+
+    @Operation(summary = "Get failed migrations", description = "Get failed migrations")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies found"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @GetMapping(value = "/failed")
+    public List<String> failedMovies() {
+        return movieMigrationService.failedMovies();
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies migrated"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @Operation(summary = "Resume migrations", description = "Resume migrations")
+    @PostMapping(value = "/resume")
+    public void resumeMigration() {
+        movieMigrationService.resumeMigration();
     }
 }

@@ -31,7 +31,7 @@ public class RatingService {
     private Rating mapToRating(RatingDto ratingDto)
     {
         Rating rating = new Rating();
-        Movie movie = movieService.getById(ratingDto.getMovieId());
+        Movie movie = movieService.findById(ratingDto.getMovieId());
         rating.setRate(ratingDto.getRate());
         rating.setRateContent(ratingDto.getContent());
         rating.setMovie(movie);
