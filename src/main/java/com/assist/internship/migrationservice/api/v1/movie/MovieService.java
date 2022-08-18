@@ -9,9 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -40,10 +37,10 @@ public class MovieService {
     }
 
     public List<Movie> findAll() {
-        return movieRepository.findAll();
+       return movieRepository.findAll();
     }
 
-    public Movie findById(String id) {
+    public Movie findById(Long id) {
         return movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
     }
 
@@ -51,13 +48,13 @@ public class MovieService {
         movieRepository.deleteAll();
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
 
         movieRepository.delete(movie);
     }
 
-    public Movie updateById(String id, MovieDto movieDto) {
+    public Movie updateById(Long id, MovieDto movieDto) {
         Movie oldMovie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found"));
         Movie updatedMovie = mapToMovie(movieDto);
         updatedMovie.setId(oldMovie.getId());
@@ -66,8 +63,8 @@ public class MovieService {
 
     }
 
-    public Movie save(Movie movie) {
-        return movieRepository.save(movie);
+    public void save(Movie movie) {
+        movieRepository.save(movie);
     }
 
     public void saveMovies(List<Movie> movies) {
@@ -91,10 +88,8 @@ public class MovieService {
         csvPrinter.flush();
     }
 
-    public Page<Movie> findMovieByReleaseDateOrderByReleaseDateDesc() {
-        //TODO: refactor, page it's used for pagination not to limit the result number
-        Pageable pageable = PageRequest.of(0, 10);
-        return movieRepository.findAll(pageable);
+    public List<Movie> findLast10() {
+        return movieRepository.findAllLast10();
     }
 
     private Movie mapToMovie(MovieDto movieDto) {

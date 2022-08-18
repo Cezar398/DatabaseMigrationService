@@ -1,6 +1,8 @@
 package com.assist.internship.migrationservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,9 +31,13 @@ public class Movie {
     private Float voteAverage;
     @Column(name = "vote_count")
     private Integer voteCount;
-    @OneToMany(mappedBy = "movie", orphanRemoval = true)
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @JsonIgnore
     private List<Rating> ratings;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "movie_country", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "country_id"))
+    @ToString.Exclude
+    @JsonIgnore
     private List<Country> countries = new ArrayList<>();
 }
