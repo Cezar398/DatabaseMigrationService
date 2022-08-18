@@ -40,7 +40,7 @@ class RatingServiceTest {
     void createRating_shouldSucceed() {
         when(ratingRepository.save(any())).thenReturn(getRatingMock());
         Movie mockMovie = getMovieMock();
-        when(movieService.findById(anyString())).thenReturn(mockMovie);
+        when(movieService.findById(anyLong())).thenReturn(mockMovie);
         RatingDto ratingDto = getRatingDtoMock();
 
         Rating result = ratingService.createRating(ratingDto);
@@ -48,7 +48,7 @@ class RatingServiceTest {
         assertEquals(1, result.getRate());
         assertSame(mockMovie, result.getMovie());
         verify(ratingRepository).save(any());
-        ArgumentCaptor<String> findByIdArg = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> findByIdArg = ArgumentCaptor.forClass(Long.class);
         verify(movieService, times(1)).findById(findByIdArg.capture());
         assertEquals(ratingDto.getMovieId(), findByIdArg.getValue());
     }
@@ -56,7 +56,7 @@ class RatingServiceTest {
     private static RatingDto getRatingDtoMock() {
         RatingDto ratingDto = new RatingDto();
         ratingDto.setContent("Not all who wander are lost");
-        ratingDto.setMovieId("42");
+        ratingDto.setMovieId(42L);
         ratingDto.setRate(1);
 
         return ratingDto;
