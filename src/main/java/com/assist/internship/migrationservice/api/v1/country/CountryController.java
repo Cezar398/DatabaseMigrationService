@@ -72,7 +72,7 @@ public class CountryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable("id") String id)
+    public void deleteById(@PathVariable("id") Long id)
     {
         countryService.deleteById(id);
     }

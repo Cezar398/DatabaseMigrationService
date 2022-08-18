@@ -8,7 +8,6 @@ import com.assist.internship.migrationservice.entity.Movie;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
@@ -17,8 +16,6 @@ import java.util.List;
 public class CountryService {
     private final CountryRepository countryRepository;
     private final MovieService movieService;
-    //TODO: remove unused variable
-    private final EntityManager entityManager;
 
     public List<Country> getAllCountries() {
         return countryRepository.findAll();
@@ -32,7 +29,7 @@ public class CountryService {
         return country;
     }
 
-    public Country findById(String id) {
+    public Country findById(Long id) {
         return countryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Country not found!"));
     }
@@ -52,7 +49,7 @@ public class CountryService {
         countryRepository.deleteAll();
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         countryRepository.deleteById(id);
     }
 
