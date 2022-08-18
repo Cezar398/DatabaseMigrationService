@@ -170,4 +170,10 @@ public class MovieController {
     public Page<Movie> getLastTen() {
         return movieService.findMovieByReleaseDateOrderByReleaseDateDesc();
     }
+
+    @GetMapping("/paginate/{start}/{end}")
+    public Page<Movie> getAllPages(@PathVariable("start") Integer start, @PathVariable("end") Integer end)
+    {
+        return movieService.getAllPages(start, end);
+    }
 }

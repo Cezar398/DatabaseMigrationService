@@ -16,4 +16,7 @@ public interface MovieRepository extends JpaRepository<Movie, String>, JpaSpecif
 
     @Query(value = "SELECT * FROM Movie ORDER BY release_date DESC", nativeQuery = true)
     Page<Movie> findAll(Pageable pageable);
+
+    @Query(value = "SELECT * FROM Movie", nativeQuery = true)
+    Page<Movie> findAllPage(Pageable pageable);
 }

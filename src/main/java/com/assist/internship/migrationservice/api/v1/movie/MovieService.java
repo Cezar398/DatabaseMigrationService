@@ -97,6 +97,12 @@ public class MovieService {
         return movieRepository.findAll(pageable);
     }
 
+    public Page<Movie> getAllPages(Integer start, Integer end)
+    {
+        Pageable pageable = PageRequest.of(start, end);
+        return movieRepository.findAllPage(pageable);
+    }
+
     private Movie mapToMovie(MovieDto movieDto) {
         Movie movie = new Movie();
         movie.setMediaType(movieDto.getMediaType());
