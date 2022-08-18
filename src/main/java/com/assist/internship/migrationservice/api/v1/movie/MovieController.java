@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -169,5 +171,11 @@ public class MovieController {
     @GetMapping("/last10/")
     public Page<Movie> getLastTen() {
         return movieService.findMovieByReleaseDateOrderByReleaseDateDesc();
+    }
+
+
+    @RequestMapping(path = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void uploadCSV(@RequestPart("file")MultipartFile multipartFile) throws IOException {
+        movieService.uploadCSV(multipartFile);
     }
 }

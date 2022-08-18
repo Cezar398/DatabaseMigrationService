@@ -44,3 +44,6 @@ export-csv:
   fileFormat: .csv
   contentType: text/csv
 
+import-csv:
+  baseUrl: /uploads/
+
