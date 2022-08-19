@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.api.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +67,7 @@ public class MovieController {
     })
     @Operation(summary = "Get mvoie", description = "Get movie by id from database")
     @GetMapping(path = "/{id}")
-    public Movie getById(@Parameter(description = "The id for movie which will be selected") @PathVariable("id") String id) {
+    public Movie getById(@Parameter(description = "The id for movie which will be selected") @PathVariable("id") Long id) {
         return movieService.findById(id);
     }
 
@@ -94,10 +93,9 @@ public class MovieController {
     })
     @Operation(summary = "Delete movie", description = "Delete movie by id from database")
     @DeleteMapping(path = "/{id}")
-    public void deleteById(@Parameter(description = "The id for movie which will be deleted") @PathVariable("id") String id) {
+    public void deleteById(@Parameter(description = "The id for movie which will be deleted") @PathVariable("id") Long id) {
         movieService.deleteById(id);
     }
-
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movie found"),
@@ -108,7 +106,7 @@ public class MovieController {
     })
     @Operation(summary = "Update movie", description = "Update a movie from database")
     @PutMapping(path = "/{id}")
-    public Movie updateById(@Parameter(description = "The id for movie which will be updated") @PathVariable("id") String id, MovieDto movieDto) {
+    public Movie updateById(@Parameter(description = "The id for movie which will be updated") @PathVariable("id") Long id, MovieDto movieDto) {
         return movieService.updateById(id, movieDto);
     }
 
@@ -148,9 +146,7 @@ public class MovieController {
     })
     @GetMapping(value = "/failed")
     public List<String> failedMovies() {
-        //TODO: pay more attention to sonar
-        List<String> ids = movieMigrationService.getFailedMovies();
-        return ids;
+        return movieMigrationService.getFailedMovies();
     }
 
     @ApiResponses(value = {
@@ -166,8 +162,16 @@ public class MovieController {
         movieMigrationService.resumeMigration();
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movies found"),
+            @ApiResponse(responseCode = "404", description = "Movies not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @Operation(summary = "Get last 10", description = "Get last 10 movies from database")
     @GetMapping("/last10/")
-    public Page<Movie> getLastTen() {
-        return movieService.findMovieByReleaseDateOrderByReleaseDateDesc();
+    public List<Movie> getLastTen() {
+        return movieService.findLast10();
     }
 }

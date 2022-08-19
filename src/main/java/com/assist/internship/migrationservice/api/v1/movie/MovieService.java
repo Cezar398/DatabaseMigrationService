@@ -4,20 +4,26 @@ import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
 import com.assist.internship.migrationservice.config.properties.ExportConfig;
+import com.assist.internship.migrationservice.config.properties.ImportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +32,9 @@ import java.util.List;
 public class MovieService {
     private final MovieRepository movieRepository;
     private final ExportConfig exportConfig;
+    private final ImportConfig importConifg;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     public Movie create(MovieDto movieDto) {
         Movie movie = mapToMovie(movieDto);
@@ -43,7 +52,7 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Movie findById(String id) {
+    public Movie findById(Long id) {
         return movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
     }
 
@@ -51,13 +60,13 @@ public class MovieService {
         movieRepository.deleteAll();
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
 
         movieRepository.delete(movie);
     }
 
-    public Movie updateById(String id, MovieDto movieDto) {
+    public Movie updateById(Long id, MovieDto movieDto) {
         Movie oldMovie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found"));
         Movie updatedMovie = mapToMovie(movieDto);
         updatedMovie.setId(oldMovie.getId());
@@ -80,21 +89,77 @@ public class MovieService {
 
         PrintWriter printWriter = new PrintWriter(response.getWriter());
 
-        CSVPrinter csvPrinter = new CSVPrinter(printWriter, CSVFormat.EXCEL.withHeader("ID", "Title", "Popularity"));
+        CSVPrinter csvPrinter = new CSVPrinter(printWriter, CSVFormat.EXCEL.withHeader());
 
         List<Movie> movies = findAll();
 
-        for (Movie movie : movies) {
-            csvPrinter.printRecord(movie.getId(), movie.getTitle(), movie.getPopularity());
-        }
+        movies.forEach(movie -> {
+            try {
+                csvPrinter.printRecord(movie.getId(),
+                        movie.getExternalId(),
+                        movie.getTitle(),
+                        movie.getOverview(),
+                        movie.getPosterPath(),
+                        movie.getMediaType(),
+                        movie.getPopularity(),
+                        movie.getReleaseDate(),
+                        movie.getVideo(),
+                        movie.getVoteAverage(),
+                        movie.getVoteCount());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         csvPrinter.flush();
     }
+    public void uploadCSV(MultipartFile multipartFile) throws IOException {
+        File csvFile = convertTempToCSV(multipartFile);
+        CSVParser csvParser = new CSVParser(new FileReader(csvFile.getPath()), CSVFormat.DEFAULT);
+        List<CSVRecord> csvRecords = csvParser.getRecords();
+        List<Movie> movies = new ArrayList<>();
+        csvRecords.stream().skip(1).forEach(i -> {
+            Movie movie = getMovie(i);
+            movies.add(movie);
+        });
+        csvParser.close();
+        saveMovies(movies);
+    }
 
-    public Page<Movie> findMovieByReleaseDateOrderByReleaseDateDesc() {
-        //TODO: refactor, page it's used for pagination not to limit the result number
-        Pageable pageable = PageRequest.of(0, 10);
-        return movieRepository.findAll(pageable);
+    private static Movie getMovie(CSVRecord i) {
+        Movie movie = new Movie();
+        movie.setExternalId(i.get(1));
+        movie.setTitle(i.get(2));
+        movie.setOverview(i.get(3));
+        movie.setPosterPath(i.get(4));
+        movie.setMediaType((i.get(5)));
+        movie.setPopularity(i.get(6));
+        movie.setReleaseDate(i.get(7));
+        movie.setVideo(Boolean.valueOf(i.get(8)));
+        movie.setVoteAverage(Float.valueOf(i.get(9)));
+        movie.setVoteCount(Integer.valueOf(i.get(10)));
+        return movie;
+    }
+
+    private File convertTempToCSV(MultipartFile multipartFile) throws IOException {
+        String baseUrl = importConifg.getBaseUrl();
+        String fullUrl = httpServletRequest.getServletContext().getRealPath(baseUrl);
+
+        if(!new File(fullUrl).exists())
+        {
+            new File(fullUrl).mkdir();
+        }
+
+        String fileOriginalName = multipartFile.getOriginalFilename();
+        String filePath = fullUrl + fileOriginalName;
+        File fileDestination = new File(filePath);
+        multipartFile.transferTo(fileDestination);
+
+        return fileDestination;
+    }
+
+    public List<Movie> findLast10() {
+        return movieRepository.findLast10();
     }
 
     private Movie mapToMovie(MovieDto movieDto) {
