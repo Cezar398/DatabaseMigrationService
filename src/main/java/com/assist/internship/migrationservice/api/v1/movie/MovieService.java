@@ -1,5 +1,6 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
+import com.assist.internship.migrationservice.api.v1.common.CSVHelper;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
@@ -7,23 +8,15 @@ import com.assist.internship.migrationservice.config.properties.ExportConfig;
 import com.assist.internship.migrationservice.config.properties.ImportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -83,79 +76,17 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) throws IOException {
+    @SneakyThrows
+    public void exportToCSV(HttpServletResponse response) {
         response.setContentType(exportConfig.getContentType());
-        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + "_movie" + exportConfig.getFileFormat());
+        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getName() + exportConfig.getFileFormat());
 
-        PrintWriter printWriter = new PrintWriter(response.getWriter());
-
-        CSVPrinter csvPrinter = new CSVPrinter(printWriter, CSVFormat.EXCEL.withHeader());
-
+        CSVHelper csvHelper = new CSVHelper();
+        csvHelper.setCsvFormat(CSVFormat.EXCEL);
+        csvHelper.setPrintWriter(response.getWriter());
         List<Movie> movies = findAll();
+        csvHelper.writeToCsv(movies, Movie.class);
 
-        movies.forEach(movie -> {
-            try {
-                csvPrinter.printRecord(movie.getId(),
-                        movie.getExternalId(),
-                        movie.getTitle(),
-                        movie.getOverview(),
-                        movie.getPosterPath(),
-                        movie.getMediaType(),
-                        movie.getPopularity(),
-                        movie.getReleaseDate(),
-                        movie.getVideo(),
-                        movie.getVoteAverage(),
-                        movie.getVoteCount());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        csvPrinter.flush();
-    }
-    public void uploadCSV(MultipartFile multipartFile) throws IOException {
-        File csvFile = convertTempToCSV(multipartFile);
-        CSVParser csvParser = new CSVParser(new FileReader(csvFile.getPath()), CSVFormat.DEFAULT);
-        List<CSVRecord> csvRecords = csvParser.getRecords();
-        List<Movie> movies = new ArrayList<>();
-        csvRecords.stream().skip(1).forEach(i -> {
-            Movie movie = getMovie(i);
-            movies.add(movie);
-        });
-        csvParser.close();
-        saveMovies(movies);
-    }
-
-    private static Movie getMovie(CSVRecord i) {
-        Movie movie = new Movie();
-        movie.setExternalId(i.get(1));
-        movie.setTitle(i.get(2));
-        movie.setOverview(i.get(3));
-        movie.setPosterPath(i.get(4));
-        movie.setMediaType((i.get(5)));
-        movie.setPopularity(i.get(6));
-        movie.setReleaseDate(i.get(7));
-        movie.setVideo(Boolean.valueOf(i.get(8)));
-        movie.setVoteAverage(Float.valueOf(i.get(9)));
-        movie.setVoteCount(Integer.valueOf(i.get(10)));
-        return movie;
-    }
-
-    private File convertTempToCSV(MultipartFile multipartFile) throws IOException {
-        String baseUrl = importConifg.getBaseUrl();
-        String fullUrl = httpServletRequest.getServletContext().getRealPath(baseUrl);
-
-        if(!new File(fullUrl).exists())
-        {
-            new File(fullUrl).mkdir();
-        }
-
-        String fileOriginalName = multipartFile.getOriginalFilename();
-        String filePath = fullUrl + fileOriginalName;
-        File fileDestination = new File(filePath);
-        multipartFile.transferTo(fileDestination);
-
-        return fileDestination;
     }
 
     public List<Movie> findLast10() {

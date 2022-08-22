@@ -9,12 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -123,6 +123,7 @@ public class MovieController {
         movieMigrationService.migrateMovies();
     }
 
+    @SneakyThrows
     @Operation(summary = "Export csv", description = "Export movie database to .csv file")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movies found"),
@@ -132,7 +133,7 @@ public class MovieController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @GetMapping(value = "/export")
-    public void exportToCSV(HttpServletResponse response) throws IOException {
+    public void exportToCSV(HttpServletResponse response){
         movieService.exportToCSV(response);
     }
 
