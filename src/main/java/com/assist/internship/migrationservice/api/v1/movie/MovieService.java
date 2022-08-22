@@ -8,7 +8,6 @@ import com.assist.internship.migrationservice.config.properties.ExportConfig;
 import com.assist.internship.migrationservice.config.properties.ImportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -68,22 +68,25 @@ public class MovieService {
 
     }
 
-    public Movie save(Movie movie) {
-        return movieRepository.save(movie);
+    public void save(Movie movie) {
+        movieRepository.save(movie);
     }
 
     public void saveMovies(List<Movie> movies) {
         movieRepository.saveAll(movies);
     }
 
-    @SneakyThrows
     public void exportToCSV(HttpServletResponse response) {
         response.setContentType(exportConfig.getContentType());
         response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getName() + exportConfig.getFileFormat());
 
         CSVHelper csvHelper = new CSVHelper();
         csvHelper.setCsvFormat(CSVFormat.EXCEL);
-        csvHelper.setPrintWriter(response.getWriter());
+        try {
+            csvHelper.setPrintWriter(response.getWriter());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         List<Movie> movies = findAll();
         csvHelper.writeToCsv(movies, Movie.class);
 

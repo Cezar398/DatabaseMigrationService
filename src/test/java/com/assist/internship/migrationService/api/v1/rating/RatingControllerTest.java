@@ -65,7 +65,7 @@ class RatingControllerTest {
     private static RatingDto getRatingDto() {
         RatingDto ratingDto = new RatingDto();
         ratingDto.setContent("Not all who wander are lost");
-        ratingDto.setMovieId("42");
+        ratingDto.setMovieId(42L);
         ratingDto.setRate(1);
         return ratingDto;
     }
