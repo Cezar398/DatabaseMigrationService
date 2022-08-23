@@ -1,22 +1,29 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.common.CSVHelper;
+import com.assist.internship.migrationservice.api.v1.movie.dto.ExportDto;
+import com.assist.internship.migrationservice.api.v1.movie.dto.ImportDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
 import com.assist.internship.migrationservice.config.properties.ExportConfig;
 import com.assist.internship.migrationservice.config.properties.ImportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -76,24 +83,89 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) {
+    public void exportToCSV(HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
         response.setContentType(exportConfig.getContentType());
-        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getName() + exportConfig.getFileFormat());
-
-        CSVHelper csvHelper = new CSVHelper();
-        csvHelper.setCsvFormat(CSVFormat.EXCEL);
-        try {
-            csvHelper.setPrintWriter(response.getWriter());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getSimpleName() + exportConfig.getFileFormat());
         List<Movie> movies = findAll();
-        csvHelper.writeToCsv(movies, Movie.class);
-
+        List<ExportDto> exportDtos  =  mapToExportDto(movies);
+        PrintWriter writer = new PrintWriter(response.getWriter());
+        StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
+        beanToCsv.write(exportDtos);
+        writer.close();
     }
 
     public List<Movie> findLast10() {
         return movieRepository.findLast10();
+    }
+    public void importFromCSV(MultipartFile multipartFile) throws IOException {
+        if(!multipartFile.getContentType().equals("text/csv"))
+        {
+            return;
+        }
+        Reader reader = new InputStreamReader(multipartFile.getInputStream());
+        List<ImportDto> beans =  new CsvToBeanBuilder(reader)
+                .withType(ImportDto.class).build().parse();
+        saveMovies(mapToMovies(beans));
+    }
+
+    private List<Movie> mapToMovies(List<ImportDto> beans) {
+        List<Movie> movies = new ArrayList<>();
+        beans.stream().forEach(bean -> {
+            Movie movie = new Movie();
+            if(bean.getId() != null)
+                movie.setId(bean.getId());
+
+            if(bean.getExternalId() != null)
+                movie.setExternalId(bean.getExternalId());
+
+            if(bean.getTitle() != null)
+                movie.setTitle(bean.getTitle());
+
+            if(bean.getOverview() != null)
+                movie.setOverview(bean.getOverview());
+
+            if(bean.getPosterPath() != null)
+                movie.setPosterPath(bean.getPosterPath());
+
+            if(bean.getPopularity() != null)
+                movie.setPopularity(bean.getPopularity());
+
+            if(bean.getReleaseDate() != null)
+                movie.setReleaseDate(bean.getReleaseDate());
+
+            if(bean.getVideo() != null)
+                movie.setVideo(bean.getVideo());
+
+            if(bean.getVoteAverage() != null)
+                movie.setVoteAverage(bean.getVoteAverage());
+
+            if(bean.getVoteCount() != null)
+                movie.setVoteCount(bean.getVoteCount());
+
+            movies.add(movie);
+        });
+
+        return movies;
+    }
+
+    private List<ExportDto> mapToExportDto(List<Movie> movies) {
+        List<ExportDto> exportDtos = new ArrayList<>();
+        movies.forEach(movie -> {
+            ExportDto exportDto = new ExportDto();
+            exportDto.setId(movie.getId());
+            exportDto.setExternalId(movie.getExternalId());
+            exportDto.setTitle(movie.getTitle());
+            exportDto.setOverview(movie.getOverview());
+            exportDto.setPosterPath(movie.getPosterPath());
+            exportDto.setMediaType(movie.getMediaType());
+            exportDto.setPopularity(movie.getPopularity());
+            exportDto.setReleaseDate(movie.getReleaseDate());
+            exportDto.setVideo(movie.getVideo());
+            exportDto.setVoteAverage(movie.getVoteAverage());
+            exportDto.setVoteCount(movie.getVoteCount());
+            exportDtos.add(exportDto);
+        });
+        return exportDtos;
     }
 
     private Movie mapToMovie(MovieDto movieDto) {
