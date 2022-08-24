@@ -1,0 +1,1 @@
+DROP SEQUENCE rating_seq;
