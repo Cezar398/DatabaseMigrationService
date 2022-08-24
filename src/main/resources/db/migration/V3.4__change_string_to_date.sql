@@ -1,0 +1,1 @@
+ALTER TABLE public.crew ALTER COLUMN birth_date TYPE timestamp USING birth_date::timestamp;

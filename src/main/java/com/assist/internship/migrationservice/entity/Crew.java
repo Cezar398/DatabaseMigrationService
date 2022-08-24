@@ -3,6 +3,7 @@ package com.assist.internship.migrationservice.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -17,7 +18,7 @@ public class Crew {
     @Column(name = "last_name")
     private String lastName;
     @Column(name = "birth_date")
-    private String birthDate;
+    private Date birthDate;
     @OneToMany(mappedBy = "crew")
     private List<Contracts> contractsList;
 }

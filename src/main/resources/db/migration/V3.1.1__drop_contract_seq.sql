@@ -1,0 +1,1 @@
+DROP SEQUENCE contract_seq;
