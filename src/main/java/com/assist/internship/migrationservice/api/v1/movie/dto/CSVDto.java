@@ -4,8 +4,8 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 
 @Data
-public class ImportDto {
-    @CsvBindByName(column = "id", required = true)
+public class CSVDto {
+    @CsvBindByName(column = "id")
     private Long id;
     @CsvBindByName(column = "externalId")
     private String externalId;

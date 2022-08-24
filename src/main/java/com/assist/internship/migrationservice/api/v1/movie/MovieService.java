@@ -1,7 +1,7 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.movie.dto.ExportDto;
-import com.assist.internship.migrationservice.api.v1.movie.dto.ImportDto;
+import com.assist.internship.migrationservice.api.v1.exception.CsvApiException;
+import com.assist.internship.migrationservice.api.v1.movie.dto.CSVDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
@@ -11,8 +11,6 @@ import com.assist.internship.migrationservice.entity.Movie;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -72,7 +72,6 @@ public class MovieService {
         updatedMovie.setId(oldMovie.getId());
 
         return movieRepository.save(updatedMovie);
-
     }
 
     public void save(Movie movie) {
@@ -83,89 +82,80 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
-        response.setContentType(exportConfig.getContentType());
-        response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getSimpleName() + exportConfig.getFileFormat());
-        List<Movie> movies = findAll();
-        List<ExportDto> exportDtos  =  mapToExportDto(movies);
-        PrintWriter writer = new PrintWriter(response.getWriter());
-        StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-        beanToCsv.write(exportDtos);
-        writer.close();
+    public void exportToCSV(HttpServletResponse response) {
+        try {
+            response.setContentType(exportConfig.getContentType());
+            response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getSimpleName() + exportConfig.getFileFormat());
+            PrintWriter writer = new PrintWriter(response.getWriter());
+            StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
+            beanToCsv.write(mapToDto(findAll()));
+            writer.close();
+        } catch (Exception e) {
+            throw new CsvApiException(e.getMessage());
+        }
     }
 
     public List<Movie> findLast10() {
         return movieRepository.findLast10();
     }
-    public void importFromCSV(MultipartFile multipartFile) throws IOException {
-        if(!multipartFile.getContentType().equals("text/csv"))
-        {
-            return;
+
+    public void importFromCSV(MultipartFile multipartFile) {
+        try {
+            Reader reader = new InputStreamReader(multipartFile.getInputStream());
+            List<CSVDto> csvDtoList = new CsvToBeanBuilder(reader)
+                    .withType(CSVDto.class)
+                    .build()
+                    .parse();
+            saveMovies(mapToMovies(csvDtoList));
+        } catch (Exception e) {
+            log.error("Error CSV: {}", e.getMessage());
+            throw new CsvApiException(e.getMessage());
         }
-        Reader reader = new InputStreamReader(multipartFile.getInputStream());
-        List<ImportDto> beans =  new CsvToBeanBuilder(reader)
-                .withType(ImportDto.class).build().parse();
-        saveMovies(mapToMovies(beans));
     }
 
-    private List<Movie> mapToMovies(List<ImportDto> beans) {
-        List<Movie> movies = new ArrayList<>();
-        beans.stream().forEach(bean -> {
-            Movie movie = new Movie();
-            if(bean.getId() != null)
-                movie.setId(bean.getId());
-
-            if(bean.getExternalId() != null)
-                movie.setExternalId(bean.getExternalId());
-
-            if(bean.getTitle() != null)
-                movie.setTitle(bean.getTitle());
-
-            if(bean.getOverview() != null)
-                movie.setOverview(bean.getOverview());
-
-            if(bean.getPosterPath() != null)
-                movie.setPosterPath(bean.getPosterPath());
-
-            if(bean.getPopularity() != null)
-                movie.setPopularity(bean.getPopularity());
-
-            if(bean.getReleaseDate() != null)
-                movie.setReleaseDate(bean.getReleaseDate());
-
-            if(bean.getVideo() != null)
-                movie.setVideo(bean.getVideo());
-
-            if(bean.getVoteAverage() != null)
-                movie.setVoteAverage(bean.getVoteAverage());
-
-            if(bean.getVoteCount() != null)
-                movie.setVoteCount(bean.getVoteCount());
-
-            movies.add(movie);
-        });
-
-        return movies;
+    private List<CSVDto> mapToDto(List<Movie> movies) {
+        return movies.stream()
+                .map(this::movieToDto)
+                .collect(Collectors.toList());
     }
 
-    private List<ExportDto> mapToExportDto(List<Movie> movies) {
-        List<ExportDto> exportDtos = new ArrayList<>();
-        movies.forEach(movie -> {
-            ExportDto exportDto = new ExportDto();
-            exportDto.setId(movie.getId());
-            exportDto.setExternalId(movie.getExternalId());
-            exportDto.setTitle(movie.getTitle());
-            exportDto.setOverview(movie.getOverview());
-            exportDto.setPosterPath(movie.getPosterPath());
-            exportDto.setMediaType(movie.getMediaType());
-            exportDto.setPopularity(movie.getPopularity());
-            exportDto.setReleaseDate(movie.getReleaseDate());
-            exportDto.setVideo(movie.getVideo());
-            exportDto.setVoteAverage(movie.getVoteAverage());
-            exportDto.setVoteCount(movie.getVoteCount());
-            exportDtos.add(exportDto);
-        });
-        return exportDtos;
+    private List<Movie> mapToMovies(List<CSVDto> csvDtos) {
+        return csvDtos.stream()
+                .map(this::csvBeanToMovie)
+                .collect(Collectors.toList());
+    }
+
+    private Movie csvBeanToMovie(CSVDto csvDto) {
+        Movie movie = new Movie();
+        movie.setId(csvDto.getId());
+        movie.setExternalId(csvDto.getExternalId());
+        movie.setTitle(csvDto.getTitle());
+        movie.setOverview(csvDto.getOverview());
+        movie.setPosterPath(csvDto.getPosterPath());
+        movie.setMediaType(csvDto.getMediaType());
+        movie.setPopularity(csvDto.getPopularity());
+        movie.setReleaseDate(csvDto.getReleaseDate());
+        movie.setVideo(csvDto.getVideo());
+        movie.setVoteAverage(csvDto.getVoteAverage());
+        movie.setVoteCount(csvDto.getVoteCount());
+        return movie;
+    }
+
+
+    private CSVDto movieToDto(Movie movie) {
+        CSVDto csvDto = new CSVDto();
+        csvDto.setId(movie.getId());
+        csvDto.setExternalId(movie.getExternalId());
+        csvDto.setTitle(movie.getTitle());
+        csvDto.setOverview(movie.getOverview());
+        csvDto.setPosterPath(movie.getPosterPath());
+        csvDto.setMediaType(movie.getMediaType());
+        csvDto.setPopularity(movie.getPopularity());
+        csvDto.setReleaseDate(movie.getReleaseDate());
+        csvDto.setVideo(movie.getVideo());
+        csvDto.setVoteAverage(movie.getVoteAverage());
+        csvDto.setVoteCount(movie.getVoteCount());
+        return csvDto;
     }
 
     private Movie mapToMovie(MovieDto movieDto) {
