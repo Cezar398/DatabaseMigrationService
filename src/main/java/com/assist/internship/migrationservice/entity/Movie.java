@@ -36,4 +36,5 @@ public class Movie {
     private List<Country> countries = new ArrayList<>();
     @OneToOne(mappedBy = "movie")
     private Contracts contracts;
+
 }
