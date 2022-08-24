@@ -9,15 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -126,7 +125,6 @@ public class MovieController {
         movieMigrationService.migrateMovies();
     }
 
-    @SneakyThrows
     @Operation(summary = "Export csv", description = "Export movie database to .csv file")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movies found"),
@@ -136,8 +134,11 @@ public class MovieController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @GetMapping(value = "/export")
-    public void exportToCSV(HttpServletResponse response){
-        movieService.exportToCSV(response);
+    public ResponseEntity<byte[]> exportToCSV() {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + Movie.class.getSimpleName())
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(movieService.exportToCSV());
     }
 
     @ApiResponses(value = {
@@ -147,9 +148,10 @@ public class MovieController {
     })
     @Operation(summary = "Import data from CSV file", description = "Import data from CSV file")
     @RequestMapping(value = "/import", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void importFromCSV(@ModelAttribute MultipartFile file) throws IOException {
+    public void importFromCSV(@Parameter(description = "CSV File for upload") @ModelAttribute MultipartFile file) {
         movieService.importFromCSV(file);
     }
+
     @Operation(summary = "Get failed migrations", description = "Get failed migrations")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Movies found"),

@@ -5,21 +5,18 @@ import com.assist.internship.migrationservice.api.v1.movie.dto.CSVDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
-import com.assist.internship.migrationservice.config.properties.ExportConfig;
-import com.assist.internship.migrationservice.config.properties.ImportConfig;
 import com.assist.internship.migrationservice.entity.Movie;
+import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -31,10 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovieService {
     private final MovieRepository movieRepository;
-    private final ExportConfig exportConfig;
-    private final ImportConfig importConifg;
-    @Autowired
-    private HttpServletRequest httpServletRequest;
 
     public Movie create(MovieDto movieDto) {
         Movie movie = mapToMovie(movieDto);
@@ -62,7 +55,6 @@ public class MovieService {
 
     public void deleteById(Long id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie not found!"));
-
         movieRepository.delete(movie);
     }
 
@@ -82,15 +74,16 @@ public class MovieService {
         movieRepository.saveAll(movies);
     }
 
-    public void exportToCSV(HttpServletResponse response) {
-        try {
-            response.setContentType(exportConfig.getContentType());
-            response.setHeader(exportConfig.getHeaderKey(), exportConfig.getHeaderValue() + Movie.class.getSimpleName() + exportConfig.getFileFormat());
-            PrintWriter writer = new PrintWriter(response.getWriter());
-            StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
+    public byte[] exportToCSV() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (CSVWriter writer = new CSVWriter(new PrintWriter(byteArrayOutputStream))) {
+            StatefulBeanToCsv<CSVDto> beanToCsv = new StatefulBeanToCsvBuilder<CSVDto>(writer).build();
             beanToCsv.write(mapToDto(findAll()));
-            writer.close();
+            writer.flush();
+
+            return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
+            log.error("Error CSV: {}", e.getMessage());
             throw new CsvApiException(e.getMessage());
         }
     }
