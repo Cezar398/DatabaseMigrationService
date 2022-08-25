@@ -1,0 +1,1 @@
+ALTER TABLE public.crew ALTER COLUMN birth_date TYPE date USING birth_date::date;
