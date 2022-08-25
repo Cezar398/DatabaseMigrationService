@@ -1,6 +1,7 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
-import com.assist.internship.migrationservice.api.v1.exception.CsvApiException;
+
+import com.assist.internship.migrationservice.api.v1.exception.CSV.CsvApiException;
 import com.assist.internship.migrationservice.api.v1.movie.dto.CSVDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;

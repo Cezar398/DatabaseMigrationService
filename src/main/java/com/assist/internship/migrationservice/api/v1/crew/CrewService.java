@@ -1,6 +1,6 @@
 package com.assist.internship.migrationservice.api.v1.crew;
 
-import com.assist.internship.migrationservice.api.v1.crew.dto.CreateDto;
+import com.assist.internship.migrationservice.api.v1.crew.dto.CrewDataDto;
 import com.assist.internship.migrationservice.api.v1.exception.CrewException.CrewApiException;
 import com.assist.internship.migrationservice.entity.Crew;
 import lombok.RequiredArgsConstructor;
@@ -16,27 +16,38 @@ public class CrewService {
     private final CrewRepository crewRepository;
     private final String CREW_NOT_FOUND = "Crew not found";
 
-    public List<Crew> getAll()
-    {
+    public List<Crew> getAll() {
         return crewRepository.findAll();
     }
 
-    public Crew getById(Long id)
-    {
+    public Crew getById(Long id) {
         return crewRepository.findById(id).orElseThrow(() -> new CrewApiException(CREW_NOT_FOUND));
     }
 
-    public void create(CreateDto createDto)
-    {
-        crewRepository.save(createDtoToCrew(createDto));
+    public void create(CrewDataDto crewDataDto) {
+        crewRepository.save(mapDtoToCrew(crewDataDto));
     }
 
-    private Crew createDtoToCrew(CreateDto createDto)
-    {
+    public void delete() {
+        crewRepository.deleteAll();
+    }
+
+    public void deleteById(Long id) {
+        crewRepository.delete(getById(id));
+    }
+
+    public Crew updateById(Long id, CrewDataDto crewDataDto) {
+        Crew oldCrew = getById(id);
+        Crew newCrew = mapDtoToCrew(crewDataDto);
+        newCrew.setId(oldCrew.getId());
+        return crewRepository.save(newCrew);
+    }
+
+    private Crew mapDtoToCrew(CrewDataDto crewDataDto) {
         Crew crew = new Crew();
-        crew.setFirstName(createDto.getFirstName());
-        crew.setLastName(createDto.getLastName());
-        crew.setBirthDate(createDto.getBirthDate());
+        crew.setFirstName(crewDataDto.getFirstName());
+        crew.setLastName(crewDataDto.getLastName());
+        crew.setBirthDate(crewDataDto.getBirthDate());
         return crew;
     }
 }
