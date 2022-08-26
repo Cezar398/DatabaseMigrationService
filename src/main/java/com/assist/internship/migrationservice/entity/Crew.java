@@ -1,5 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -21,6 +22,7 @@ public class Crew {
     @Column(name = "birth_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
-    @OneToMany(mappedBy = "crew")
+    @OneToMany(mappedBy = "crew", orphanRemoval = true)
+    @JsonManagedReference
     private List<Contract> contractList;
 }

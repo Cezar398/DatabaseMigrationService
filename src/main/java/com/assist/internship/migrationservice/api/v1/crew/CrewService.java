@@ -43,6 +43,11 @@ public class CrewService {
         return crewRepository.save(newCrew);
     }
 
+    public void save(Crew crew)
+    {
+        crewRepository.save(crew);
+    }
+
     private Crew mapDtoToCrew(CrewDataDto crewDataDto) {
         Crew crew = new Crew();
         crew.setFirstName(crewDataDto.getFirstName());

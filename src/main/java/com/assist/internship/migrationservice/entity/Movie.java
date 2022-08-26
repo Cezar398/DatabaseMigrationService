@@ -1,5 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -34,7 +35,8 @@ public class Movie {
     @ManyToMany
     @JoinTable(name = "movie_country", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "country_id"))
     private List<Country> countries = new ArrayList<>();
-    @OneToOne(mappedBy = "movie")
-    private Contracts contracts;
+    @OneToOne(mappedBy = "movie", orphanRemoval = true)
+    @JsonBackReference
+    private Contract contract;
 
 }
