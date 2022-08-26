@@ -22,5 +22,5 @@ public class Crew {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
     @OneToMany(mappedBy = "crew")
-    private List<Contracts> contractsList;
+    private List<Contract> contractList;
 }
