@@ -1,12 +1,12 @@
 package com.assist.internship.migrationservice.api.v1.crew;
 
 import com.assist.internship.migrationservice.api.v1.crew.dto.CrewDataDto;
-import com.assist.internship.migrationservice.api.v1.exception.CrewException.CrewApiException;
 import com.assist.internship.migrationservice.entity.Crew;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class CrewService {
     }
 
     public Crew getById(Long id) {
-        return crewRepository.findById(id).orElseThrow(() -> new CrewApiException(CREW_NOT_FOUND));
+        return crewRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(CREW_NOT_FOUND));
     }
 
     public void create(CrewDataDto crewDataDto) {
