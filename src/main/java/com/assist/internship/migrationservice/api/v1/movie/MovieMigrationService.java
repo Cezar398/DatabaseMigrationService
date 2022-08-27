@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -27,30 +27,25 @@ public class MovieMigrationService {
         if (idList.isEmpty()) {
             return;
         }
-        List<Movie> movies = getMovies(idList);
-        movieService.saveMovies(movies);
+        movieService.saveMovies(getMovies(idList));
     }
 
     private List<Movie> getMovies(List<String> idList) {
-        List<Movie> movies = new ArrayList<>();
+        return idList.stream().parallel().map(this::getMovie).collect(Collectors.toList());
+    }
 
-        //TODO: improve parallel processing
-        idList.stream().parallel().forEach(id -> {
-            //TODO: extract to a separate method
-            String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
-            MovieResponse movieResponse = webClientService.getMovie(url);
-            movies.add(getMovie(movieResponse.getFirst(), id));
-        });
-        return movies;
+    private Movie getMovie(String id) {
+        String url = String.format("/find/%s?api_key=%s&language=en-US&external_source=imdb_id", id, migrationConfig.getToken());
+        MovieResponse movieResponse = webClientService.getMovie(url);
+        return getMovie(movieResponse.getFirst(), id);
     }
 
     public void resumeMigration() {
-        List<String> idList = failedMovies();
+        List<String> idList = getFailedMovies();
         if (idList.isEmpty()) {
             return;
         }
-        List<Movie> movies = getMovies(idList);
-        movieService.saveMovies(movies);
+        movieService.saveMovies(getMovies(idList));
     }
 
     private Movie getMovie(MovieObject movieData, String id) {
@@ -70,31 +65,19 @@ public class MovieMigrationService {
     }
 
     public List<String> getFailedMovies() {
-        //TODO: remove this method
-        return failedMovies();
-    }
-
-    private List<String> failedMovies() {
         List<String> idList = getIdList();
-        List<String> notFoundIdList = new ArrayList<>();
-        List<Movie> movies = movieService.findAll();
-        //TODO: re-write the way you populate addedIds using Java 8 stream features
-        List<String> addedIds = new ArrayList<>();
-
-        movies.stream().forEach(movie -> {
-            addedIds.add(movie.getExternalId());
-        });
-
-        idList.stream().forEach(id -> {
-            if (!addedIds.contains(id)) {
-                notFoundIdList.add(id);
-            }
-        });
-
-        return notFoundIdList;
+        List<String> addedIds = movieService.findAll().stream().map(Movie::getExternalId).toList();
+        return idList.stream().filter(id -> !addedIds.contains(id)).toList();
     }
 
-    private List<String> getIdList() {
+    @Cacheable(value = "idList")
+    public List<String> getIdList()
+    {
+        return IdList();
+    }
+
+    private List<String> IdList() {
         return webClientService.getIds("/api/v1/movie/imdb/ids");
     }
+
 }
