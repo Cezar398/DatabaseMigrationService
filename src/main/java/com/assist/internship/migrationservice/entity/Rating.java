@@ -1,6 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,8 +16,8 @@ public class Rating {
     private String rateContent;
     @Column(name = "rate")
     private int rate;
-    @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "movie_id")
     private Movie movie;
 }

@@ -1,7 +1,7 @@
 package com.assist.internship.migrationservice.api.v1.country;
 
+import com.assist.internship.migrationservice.api.v1.country.dto.AddMovieDto;
 import com.assist.internship.migrationservice.api.v1.country.dto.CountryDto;
-import com.assist.internship.migrationservice.api.v1.country.dto.CreateCountryDto;
 import com.assist.internship.migrationservice.entity.Country;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,8 +32,7 @@ public class CountryController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @GetMapping()
-    public List<Country> getAll()
-    {
+    public List<Country> getAll() {
         return countryService.getAllCountries();
     }
 
@@ -46,8 +45,7 @@ public class CountryController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @PostMapping()
-    public Country createCountry(@Parameter(description = "Country data") @RequestBody CountryDto countryDto)
-    {
+    public Country createCountry(@Parameter(description = "Country data") @RequestBody CountryDto countryDto) {
         return countryService.createCountry(countryDto);
     }
 
@@ -60,20 +58,17 @@ public class CountryController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @PostMapping("/movie")
-    public Country addMovieToCountry(@RequestBody CreateCountryDto countryDto)
-    {
+    public Country addMovieToCountry(@RequestBody AddMovieDto countryDto) {
         return countryService.addMovieToCountry(countryDto);
     }
 
     @DeleteMapping
-    public void deleteAll()
-    {
+    public void deleteAll() {
         countryService.deleteAll();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable("id") Long id)
-    {
+    public void deleteById(@PathVariable("id") Long id) {
         countryService.deleteById(id);
     }
 

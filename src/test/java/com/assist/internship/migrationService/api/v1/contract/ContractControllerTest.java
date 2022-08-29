@@ -3,7 +3,7 @@ package com.assist.internship.migrationService.api.v1.contract;
 import com.assist.internship.migrationservice.api.v1.contract.ContractController;
 import com.assist.internship.migrationservice.api.v1.contract.ContractService;
 import com.assist.internship.migrationservice.entity.Contract;
-import com.assist.internship.migrationservice.entity.Crew;
+import com.assist.internship.migrationservice.entity.Member;
 import com.assist.internship.migrationservice.entity.Movie;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -117,7 +117,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-10-01"));
         contract.setEndDate(Date.valueOf("2001-10-01"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Crew());
+        contract.setCrew(new Member());
         return contract;
     }
 
@@ -127,7 +127,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-10-1"));
         contract.setEndDate(Date.valueOf("2001-10-1"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Crew());
+        contract.setCrew(new Member());
         return contract;
     }
 
@@ -137,7 +137,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-2-30"));
         contract.setEndDate(Date.valueOf("2001-2-30"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Crew());
+        contract.setCrew(new Member());
         return contract;
     }
 
@@ -147,7 +147,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-13-30"));
         contract.setEndDate(Date.valueOf("2001-13-30"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Crew());
+        contract.setCrew(new Member());
         return contract;
     }
 }

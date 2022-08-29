@@ -4,6 +4,7 @@ package com.assist.internship.migrationservice.api.v1.movie;
 import com.assist.internship.migrationservice.api.v1.exception.CSV.CsvApiException;
 import com.assist.internship.migrationservice.api.v1.movie.dto.CSVDto;
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
+import com.assist.internship.migrationservice.api.v1.movie.dto.MovieInfoDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSpecification;
 import com.assist.internship.migrationservice.entity.Movie;
@@ -37,9 +38,23 @@ public class MovieService {
         return movie;
     }
 
-    public List<Movie> getAll(MovieSearchCriteria movieSearchCriteria) {
+    public List<MovieInfoDto> getAll(MovieSearchCriteria movieSearchCriteria) {
         MovieSpecification specification = new MovieSpecification(movieSearchCriteria);
-        return movieRepository.findAll(specification);
+        return movieRepository.findAll(specification).stream().map(movie -> MovieInfoDto
+                        .builder()
+                        .id(movie.getId())
+                        .externalId(movie.getExternalId())
+                        .title(movie.getTitle())
+                        .overview(movie.getOverview())
+                        .posterPath(movie.getPosterPath())
+                        .mediaType(movie.getMediaType())
+                        .popularity(movie.getPopularity())
+                        .releaseDate(movie.getReleaseDate())
+                        .video(movie.getVideo())
+                        .voteAverage(movie.getVoteAverage())
+                        .voteCount(movie.getVoteCount())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public List<Movie> findAll() {

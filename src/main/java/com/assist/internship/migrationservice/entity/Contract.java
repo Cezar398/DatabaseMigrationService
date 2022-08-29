@@ -1,7 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -21,12 +20,12 @@ public class Contract {
     @Column(name = "end_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
-    @ManyToOne
-    @JoinColumn(name = "crew_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
     @JsonBackReference
-    private Crew crew;
-    @OneToOne
-    @JoinColumn(name="movie_id", referencedColumnName = "id")
-    @JsonManagedReference
+    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id", referencedColumnName = "id")
+    @JsonBackReference
     private Movie movie;
 }

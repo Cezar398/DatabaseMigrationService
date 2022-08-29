@@ -1,0 +1,1 @@
+ALTER TABLE public.crew RENAME TO member

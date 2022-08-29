@@ -1,7 +1,8 @@
 package com.assist.internship.migrationservice.api.v1.crew;
 
 import com.assist.internship.migrationservice.api.v1.crew.dto.CrewDataDto;
-import com.assist.internship.migrationservice.entity.Crew;
+import com.assist.internship.migrationservice.api.v1.crew.dto.CrewInfoDto;
+import com.assist.internship.migrationservice.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/crew")
-@Tag(description = "Crew resources that provides access to available crew", name = "Crew Resource")
+@Tag(description = "Member resources that provides access to available crew", name = "Member Resource")
 public class CrewController {
     private final CrewService crewService;
 
@@ -29,12 +30,12 @@ public class CrewController {
     })
     @Operation(description = "Get all crew from database", summary = "Get all")
     @GetMapping
-    public List<Crew> getAll() {
+    public List<CrewInfoDto> getAll() {
         return crewService.getAll();
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Crew have been selected"),
+            @ApiResponse(responseCode = "200", description = "Member have been selected"),
             @ApiResponse(responseCode = "404", description = "No crew found"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -42,13 +43,13 @@ public class CrewController {
     })
     @Operation(description = "Get crew by id from database", summary = "Get crew")
     @GetMapping("/{id}")
-    public Crew getById(@Parameter(description = "Crew ID", example = "3") @PathVariable("id") Long id) {
+    public Member getById(@Parameter(description = "Member ID", example = "3") @PathVariable("id") Long id) {
         return crewService.getById(id);
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Crew has been created"),
-            @ApiResponse(responseCode = "404", description = "Crew has not been created"),
+            @ApiResponse(responseCode = "200", description = "Member has been created"),
+            @ApiResponse(responseCode = "404", description = "Member has not been created"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
@@ -73,8 +74,8 @@ public class CrewController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Crew has been deleted"),
-            @ApiResponse(responseCode = "404", description = "Crew not deleted"),
+            @ApiResponse(responseCode = "200", description = "Member has been deleted"),
+            @ApiResponse(responseCode = "404", description = "Member not deleted"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
@@ -86,15 +87,15 @@ public class CrewController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Crew has been updated"),
-            @ApiResponse(responseCode = "404", description = "Crew not updated"),
+            @ApiResponse(responseCode = "200", description = "Member has been updated"),
+            @ApiResponse(responseCode = "404", description = "Member not updated"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     })
     @Operation(description = "Update crew from database", summary = "Update crew")
     @PutMapping("/{id}")
-    public Crew updateById(@Parameter(description = "Id for crew to be updated") @PathVariable("id") Long id, @ParameterObject CrewDataDto crewDataDto) {
+    public Member updateById(@Parameter(description = "Id for crew to be updated") @PathVariable("id") Long id, @ParameterObject CrewDataDto crewDataDto) {
         return crewService.updateById(id, crewDataDto);
     }
 }
