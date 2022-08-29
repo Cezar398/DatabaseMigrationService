@@ -1,6 +1,6 @@
 package com.assist.internship.migrationservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,8 +16,8 @@ public class Country {
     private Long id;
     @Column(name = "name")
     private String name;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "countries")
+    @ManyToMany(mappedBy = "countries", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Movie> movieList = new ArrayList<>();
 }
 

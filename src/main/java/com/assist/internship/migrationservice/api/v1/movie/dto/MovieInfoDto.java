@@ -1,9 +1,15 @@
 package com.assist.internship.migrationservice.api.v1.movie.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
-public class MovieDto {
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MovieInfoDto {
+    private Long id;
+    private String externalId;
     private String title;
     private String overview;
     private String posterPath;

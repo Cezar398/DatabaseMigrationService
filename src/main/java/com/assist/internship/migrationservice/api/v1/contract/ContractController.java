@@ -1,11 +1,13 @@
 package com.assist.internship.migrationservice.api.v1.contract;
 
 import com.assist.internship.migrationservice.api.v1.contract.dto.ContractDataDto;
+import com.assist.internship.migrationservice.api.v1.contract.dto.ContractInfoDto;
 import com.assist.internship.migrationservice.entity.Contract;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "api/v1/contract")
+@Tag(description = "Contract operations", name = "Contract")
 public class ContractController {
     private final ContractService contractService;
 
@@ -27,7 +30,7 @@ public class ContractController {
     })
     @Operation(description = "Get all contracts from database", summary = "Get all")
     @GetMapping
-    public List<Contract> getAll()
+    public List<ContractInfoDto> getAll()
     {
         return contractService.getAll();
     }

@@ -1,7 +1,7 @@
 package com.assist.internship.migrationservice.api.v1.country;
 
+import com.assist.internship.migrationservice.api.v1.country.dto.AddMovieDto;
 import com.assist.internship.migrationservice.api.v1.country.dto.CountryDto;
-import com.assist.internship.migrationservice.api.v1.country.dto.CreateCountryDto;
 import com.assist.internship.migrationservice.api.v1.movie.MovieService;
 import com.assist.internship.migrationservice.entity.Country;
 import com.assist.internship.migrationservice.entity.Movie;
@@ -34,7 +34,7 @@ public class CountryService {
                 .orElseThrow(() -> new EntityNotFoundException("Country not found!"));
     }
 
-    public Country addMovieToCountry(CreateCountryDto countryDto) {
+    public Country addMovieToCountry(AddMovieDto countryDto) {
         Movie movie = movieService.findById(countryDto.getMovieId());
         Country country = findById(countryDto.getCountryId());
         movie.getCountries().add(country);

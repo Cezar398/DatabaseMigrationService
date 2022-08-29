@@ -1,6 +1,7 @@
 package com.assist.internship.migrationservice.api.v1.movie;
 
 import com.assist.internship.migrationservice.api.v1.movie.dto.MovieDto;
+import com.assist.internship.migrationservice.api.v1.movie.dto.MovieInfoDto;
 import com.assist.internship.migrationservice.api.v1.movie.specification.MovieSearchCriteria;
 import com.assist.internship.migrationservice.entity.Movie;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,8 +50,7 @@ public class MovieController {
     })
 
     @GetMapping()
-    public List<Movie> getAll(@ParameterObject MovieSearchCriteria criteria) {
-        //TODO: return list of movies without ratings and countries
+    public List<MovieInfoDto> getAll(@ParameterObject MovieSearchCriteria criteria) {
         MovieSearchCriteria movieSearchCriteria = MovieSearchCriteria.builder()
                 .title(criteria.getTitle())
                 .overview(criteria.getOverview())

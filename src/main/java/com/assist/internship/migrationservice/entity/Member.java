@@ -6,12 +6,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.util.List;
 
 @Data
 @Entity
-@Table(name="crew")
-public class Crew {
+@Table(name = "member")
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "crew_seq")
     private Long id;
@@ -22,7 +21,7 @@ public class Crew {
     @Column(name = "birth_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
-    @OneToMany(mappedBy = "crew", orphanRemoval = true)
+    @OneToOne(mappedBy = "member", orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Contract> contractList;
+    private Contract contract;
 }
