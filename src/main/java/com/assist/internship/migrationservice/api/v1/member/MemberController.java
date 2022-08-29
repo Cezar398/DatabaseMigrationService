@@ -1,7 +1,7 @@
-package com.assist.internship.migrationservice.api.v1.crew;
+package com.assist.internship.migrationservice.api.v1.member;
 
-import com.assist.internship.migrationservice.api.v1.crew.dto.CrewDataDto;
-import com.assist.internship.migrationservice.api.v1.crew.dto.CrewInfoDto;
+import com.assist.internship.migrationservice.api.v1.member.dto.MemberDataDto;
+import com.assist.internship.migrationservice.api.v1.member.dto.MemberInfoDto;
 import com.assist.internship.migrationservice.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,8 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/crew")
 @Tag(description = "Member resources that provides access to available crew", name = "Member Resource")
-public class CrewController {
-    private final CrewService crewService;
+public class MemberController {
+    private final MemberService memberService;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "All crew have been selected"),
@@ -30,8 +30,8 @@ public class CrewController {
     })
     @Operation(description = "Get all crew from database", summary = "Get all")
     @GetMapping
-    public List<CrewInfoDto> getAll() {
-        return crewService.getAll();
+    public List<MemberInfoDto> getAll() {
+        return memberService.getAll();
     }
 
     @ApiResponses(value = {
@@ -44,7 +44,7 @@ public class CrewController {
     @Operation(description = "Get crew by id from database", summary = "Get crew")
     @GetMapping("/{id}")
     public Member getById(@Parameter(description = "Member ID", example = "3") @PathVariable("id") Long id) {
-        return crewService.getById(id);
+        return memberService.getById(id);
     }
 
     @ApiResponses(value = {
@@ -56,8 +56,8 @@ public class CrewController {
     })
     @Operation(description = "Create crew", summary = "Create crew")
     @PostMapping
-    public void create(@ParameterObject CrewDataDto crewDataDto) {
-        crewService.create(crewDataDto);
+    public void create(@ParameterObject MemberDataDto memberDataDto) {
+        memberService.create(memberDataDto);
     }
 
     @ApiResponses(value = {
@@ -70,7 +70,7 @@ public class CrewController {
     @Operation(description = "Delete all crews from database", summary = "Delete all")
     @DeleteMapping
     public void delete() {
-        crewService.delete();
+        memberService.delete();
     }
 
     @ApiResponses(value = {
@@ -83,7 +83,7 @@ public class CrewController {
     @Operation(description = "Delete crew from database", summary = "Delete crew")
     @DeleteMapping("/{id}")
     public void deleteById(@Parameter(description = "Id for crew to be deleted", example = "3") @PathVariable("id") Long id) {
-        crewService.deleteById(id);
+        memberService.deleteById(id);
     }
 
     @ApiResponses(value = {
@@ -95,7 +95,7 @@ public class CrewController {
     })
     @Operation(description = "Update crew from database", summary = "Update crew")
     @PutMapping("/{id}")
-    public Member updateById(@Parameter(description = "Id for crew to be updated") @PathVariable("id") Long id, @ParameterObject CrewDataDto crewDataDto) {
-        return crewService.updateById(id, crewDataDto);
+    public Member updateById(@Parameter(description = "Id for crew to be updated") @PathVariable("id") Long id, @ParameterObject MemberDataDto memberDataDto) {
+        return memberService.updateById(id, memberDataDto);
     }
 }
