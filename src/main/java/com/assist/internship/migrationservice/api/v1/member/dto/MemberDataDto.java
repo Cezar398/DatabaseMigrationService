@@ -1,4 +1,4 @@
-package com.assist.internship.migrationservice.api.v1.crew.dto;
+package com.assist.internship.migrationservice.api.v1.member.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,7 +9,7 @@ import java.sql.Date;
 
 
 @Data
-public class CrewDataDto {
+public class MemberDataDto {
     @Parameter(in = ParameterIn.QUERY,description = "Member first name", required = true, example = "Jim")
     private String firstName;
     @Parameter(in = ParameterIn.QUERY,description = "Member last name", required = true, example = "Smith")

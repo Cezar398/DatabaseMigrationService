@@ -1,4 +1,4 @@
-package com.assist.internship.migrationservice.api.v1.crew.dto;
+package com.assist.internship.migrationservice.api.v1.member.dto;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.sql.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrewInfoDto {
+public class MemberInfoDto {
     private Long id;
     private String firstName;
     private String lastName;

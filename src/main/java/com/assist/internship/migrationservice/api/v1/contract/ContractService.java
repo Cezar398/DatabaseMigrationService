@@ -2,7 +2,7 @@ package com.assist.internship.migrationservice.api.v1.contract;
 
 import com.assist.internship.migrationservice.api.v1.contract.dto.ContractDataDto;
 import com.assist.internship.migrationservice.api.v1.contract.dto.ContractInfoDto;
-import com.assist.internship.migrationservice.api.v1.crew.CrewService;
+import com.assist.internship.migrationservice.api.v1.member.MemberService;
 import com.assist.internship.migrationservice.api.v1.movie.MovieService;
 import com.assist.internship.migrationservice.entity.Contract;
 import com.assist.internship.migrationservice.entity.Member;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class ContractService {
     private final ContractRepository contractRepository;
     private final MovieService movieService;
-    private final CrewService crewService;
+    private final MemberService memberService;
 
     private final String CONTRACT_NOT_FOUND = "Contract not found!";
 
@@ -41,7 +41,7 @@ public class ContractService {
 
     public void create(ContractDataDto contractDataDto) {
         Movie movie = movieService.findById(contractDataDto.getMovieId());
-        Member crew = crewService.getById(contractDataDto.getCrewId());
+        Member crew = memberService.getById(contractDataDto.getCrewId());
         Contract contract = mapToContract(contractDataDto, movie, crew);
         contractRepository.save(contract);
     }
