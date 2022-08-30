@@ -117,7 +117,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-10-01"));
         contract.setEndDate(Date.valueOf("2001-10-01"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Member());
+        contract.setMember(new Member());
         return contract;
     }
 
@@ -127,7 +127,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-10-1"));
         contract.setEndDate(Date.valueOf("2001-10-1"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Member());
+        contract.setMember(new Member());
         return contract;
     }
 
@@ -137,7 +137,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-2-30"));
         contract.setEndDate(Date.valueOf("2001-2-30"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Member());
+        contract.setMember(new Member());
         return contract;
     }
 
@@ -147,7 +147,7 @@ public class ContractControllerTest {
         contract.setStartDate(Date.valueOf("2000-13-30"));
         contract.setEndDate(Date.valueOf("2001-13-30"));
         contract.setMovie(new Movie());
-        contract.setCrew(new Member());
+        contract.setMember(new Member());
         return contract;
     }
 }
