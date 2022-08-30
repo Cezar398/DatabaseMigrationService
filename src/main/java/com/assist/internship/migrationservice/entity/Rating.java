@@ -16,8 +16,8 @@ public class Rating {
     private String rateContent;
     @Column(name = "rate")
     private int rate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @ManyToOne
     @JoinColumn(name = "movie_id")
+    @JsonBackReference
     private Movie movie;
 }
